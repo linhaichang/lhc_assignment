@@ -29,16 +29,15 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     @Resource
     protected String m_Creator;
     @Resource
-    protected List<String> m_Handlers;
+    protected Set<String> m_Handlers;
     @Resource
-    protected List<String> m_Followers;
+    protected Set<String> m_Followers;
     @Resource
     protected String m_Charger;
-
+    /*索引处*/
     @Index
     @Resource
     protected String m_LableId;
-
     @Resource
     protected Date m_StartTime;
     @Resource
@@ -51,7 +50,8 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     protected int m_Level;
     @Resource
     protected UniteId m_FatherID;
-
+    /*保存状态扭转的规则*/
+    private static HashMap<Integer,List> hashMap = new HashMap<>();
 //    private static final SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     protected AssignmentImpl(AssignmentDi di) {
@@ -59,11 +59,11 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     public AssignmentImpl(AssignmentDi di,String title,String content,
-                          /*String creator,*/List<String> handler,
+                          /*String creator,*/Set<String> handler,
                           String charger,String lableId,Date startTime,
                           Date endTime,int level){
         super(di);
-        genPersistenceId(lableId);
+        genPersistenceId();
         m_Title=title;
         m_Content=content;
         m_Creator= Global.TLS.getValue("creator");
@@ -77,7 +77,6 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Level=level;
         m_CreateTime=new Date();
         m_FatherID=null;
-//        m_Lable.getAssignments().add(this.m_Title);
         markPersistenceUpdate();
     }
 
@@ -87,11 +86,11 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
      * @param di 业务依赖接口
      */
     public AssignmentImpl(AssignmentDi di, String title, String content,
-                          List<String> handlers, String charger,
+                          Set<String> handlers, String charger,
                           String lableId, Date startTime, Date endTime,
                           int level, UniteId fatherID/*String creator*/) {
         super(di);
-        genPersistenceId(lableId);
+        genPersistenceId(fatherID.getId());
         m_Title = title;
         m_Content = content;
         m_Creator= Global.TLS.getValue("creator");
@@ -132,7 +131,10 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     @Override
-    public void addHandler(List<String> handlers) {
+    public void addHandler(Set<String> handlers) {
+        if (null == handlers){
+            return;
+        }
         for (String handler : handlers) {
             m_Handlers.add(handler);
         }
@@ -140,7 +142,10 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     @Override
-    public void removeHandler(List<String> handlers) {
+    public void removeHandler(Set<String> handlers) {
+        if (null == handlers){
+            return;
+        }
         for (String handler : handlers) {
             m_Handlers.remove(handler);
         }
@@ -149,6 +154,9 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
 
     @Override
     public void addFollower(String follower) {
+        if (null ==follower){
+            return;
+        }
         m_Followers.add(follower);
         markPersistenceUpdate();
     }
@@ -162,18 +170,27 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
 
     @Override
     public void setLableId(String lableId) {
+        if (m_LableId == lableId){
+            return;
+        }
         m_LableId=lableId;
         markPersistenceUpdate();
     }
 
     @Override
     public void setStartTime(Date startTime) {
+        if (m_StartTime == startTime){
+            return;
+        }
         m_StartTime=startTime;
         markPersistenceUpdate();
     }
 
     @Override
     public void setEndTime(Date endTime) {
+        if (m_EndTime == endTime){
+            return;
+        }
         m_EndTime=endTime;
         markPersistenceUpdate();
     }
@@ -189,12 +206,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     @Override
-    public List<String> getHandler() {
+    public Set<String> getHandler() {
         return m_Handlers;
     }
 
     @Override
-    public List<String> getFollower() {
+    public Set<String> getFollower() {
         return m_Followers;
     }
 
@@ -233,17 +250,35 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         return STATES.get(m_State) ;
     }
 
-
-
-    HashMap<Integer,List> hashMap = new HashMap<>();
-
+    static {
+        /*评估中：-》规划中，已拒绝，*/
+        hashMap.put(STATE_ESTIMATE.id, Arrays.asList(STATE_PLAN.id,STATE_REJECT.id));
+        /*规划中：-》待开发，已拒绝，挂起*/
+        hashMap.put(STATE_PLAN.id, Arrays.asList(STATE_WAIT_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
+        /*待开发：-》开发中，已拒绝，挂起*/
+        hashMap.put(STATE_WAIT_DEVELOP.id, Arrays.asList(STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
+        /*开发中：-》待测试，已拒绝，挂起*/
+        hashMap.put(STATE_DEVELOP.id, Arrays.asList(STATE_WAIT_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
+        /*待测试：-》开发中，测试中，已拒绝，挂起*/
+        hashMap.put(STATE_WAIT_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_TEST,STATE_REJECT.id,STATE_PENDING.id));
+        /*测试中：-》开发中，测试通过，已拒绝，挂起*/
+        hashMap.put(STATE_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_PASS_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
+        /*测试通过：-》开发中，已上线，已拒绝，挂起，*/
+        hashMap.put(STATE_PASS_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
+        /*以上线：-》无 */
+        hashMap.put(STATE_ONLINE.id, Arrays.asList());
+        /*已拒绝：-》无 */
+        hashMap.put(STATE_REJECT.id, Arrays.asList());
+        /*挂起：-》评估中，待开发，待测试，测试通过，已拒绝，*/
+        hashMap.put(STATE_PENDING.id, Arrays.asList(STATE_ESTIMATE.id,STATE_DEVELOP.id,STATE_WAIT_TEST.id,STATE_PASS_TEST.id,STATE_REJECT.id));
+    }
     @Override
-    public void changState(int stateId) throws ApiException {
-        hashMap.put(STATE_ESTIMATE.id, Arrays.asList(STATE_PLAN.id,STATE_REJECT.id,STATE_PENDING.id));
+    public void changeState(int stateId) throws ApiException {
         List list = hashMap.get(getState().id);
         if (list.contains(stateId)) {
             m_State = stateId;
         }
+        markPersistenceUpdate();
     }
 
     @Override

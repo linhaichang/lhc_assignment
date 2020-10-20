@@ -5,6 +5,7 @@ import cn.weforward.data.UniteId;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author HaiChang
@@ -17,7 +18,7 @@ public interface AssignmentService {
     int OPTION_PERSON_FOLLOW = 2;
 
     int OPTION_ASSIGN_FINISH = 7;
-    Assignment createAssignment(String title, String content,String creator, List<String> handlers,
+    Assignment createAssignment(String title, String content,String creator, Set<String> handlers,
                                 String charger, String lableId, Date startTime,
                                 Date endTime,int level);
     Assignment getAssignment(String id);

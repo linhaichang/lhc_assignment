@@ -1,5 +1,7 @@
 package cn.haichang.assignment;
 
+import cn.haichang.assignment.impl.AssignmentImpl;
+import cn.weforward.common.ResultPage;
 import cn.weforward.data.UniteId;
 
 import java.util.List;
@@ -14,7 +16,5 @@ public interface Lable {
     void setLableName(String lableName);
     String getLableName();
 
-    void deleteLable();
-
-//    List<String> getAssignments();
+    ResultPage<AssignmentImpl> getAssignments();
 }

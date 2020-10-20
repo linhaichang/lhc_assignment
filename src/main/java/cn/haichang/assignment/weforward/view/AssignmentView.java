@@ -8,6 +8,7 @@ import cn.weforward.protocol.doc.annotation.DocObject;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author HaiChang
@@ -41,12 +42,12 @@ public class AssignmentView {
     }
 
     @DocAttribute(description = "任务处理人")
-    public List<String> getHandler() {
+    public Set<String> getHandler() {
         return m_Assignment.getHandler();
     }
 
     @DocAttribute(description = "跟进人")
-    public List<String> getFollower() {
+    public Set<String> getFollower() {
         return m_Assignment.getFollower();
     }
 

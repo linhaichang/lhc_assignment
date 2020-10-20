@@ -3,6 +3,7 @@ package cn.haichang.assignment.impl;
 import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.Lable;
 import cn.haichang.assignment.di.AssignmentDi;
+import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.TransList;
 import cn.weforward.data.UniteId;
 import cn.weforward.data.persister.support.AbstractPersistent;
@@ -19,8 +20,8 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
     @Resource
     protected String m_LableName;
 
-    @Resource
-    protected List<String> m_Assignments;
+//    @Resource
+//    protected List<String> m_Assignments;
 
 
     protected LableImpl(AssignmentDi di) {
@@ -55,13 +56,10 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
     }
 
     @Override
-    public void deleteLable() {
-
+    public ResultPage<AssignmentImpl> getAssignments() {
+        ResultPage<AssignmentImpl> assignments = getBusinessDi().searchAssignmentByLableId(getId().getId());
+        return assignments;
     }
 
-//    @Override
-//    public List<String> getAssignments() {
-//        return m_Assignments;
-//    }
-
 }
+

@@ -8,6 +8,7 @@ import cn.weforward.framework.ApiException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 任务
@@ -59,8 +60,8 @@ public interface Assignment {
     void setTitle(String title);
     void setContent(String content);
 
-    void addHandler(List<String> handlers);
-    void removeHandler(List<String> handlers);
+    void addHandler(Set<String> handlers);
+    void removeHandler(Set<String> handlers);
     void addFollower(String follower);
     void setCharger(String charger);
 
@@ -73,8 +74,8 @@ public interface Assignment {
     String getTitle();
     String getContent();
 
-    List<String> getHandler();
-    List<String> getFollower();
+    Set<String> getHandler();
+    Set<String> getFollower();
     String getCharger();
     String getCreator();
     String getLable();
@@ -84,7 +85,7 @@ public interface Assignment {
 
     NameItem getState();
 
-    void changState(int stateId) throws ApiException;
+    void changeState(int stateId) throws ApiException;
 
     void LevelHighest();
     void LevelHigh();

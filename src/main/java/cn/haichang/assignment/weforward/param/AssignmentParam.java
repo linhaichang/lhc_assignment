@@ -6,6 +6,7 @@ import cn.weforward.protocol.doc.annotation.DocObject;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author HaiChang
@@ -18,7 +19,7 @@ public class AssignmentParam {
     protected List<String> m_Handlers;
     protected String  m_Followers;
     protected String m_Charger;
-    protected Lable m_Lable;
+    protected String  m_LableId;
     protected Date m_StartTime;
     protected Date m_EndTime;
     protected int m_Level;
@@ -65,12 +66,12 @@ public class AssignmentParam {
         this.m_Charger = m_Charger;
     }
     @DocAttribute(necessary = true,description = "标签",example = "内务大厅")
-    public Lable getLable() {
-        return m_Lable;
+    public String getLable() {
+        return m_LableId;
     }
 
-    public void setLable(Lable m_Lable) {
-        this.m_Lable = m_Lable;
+    public void setLable(String Id) {
+        this.m_LableId = m_LableId;
     }
     @DocAttribute(necessary = true,description = "起始时间",example = "2019-10-29T00:30:00.666Z")
     public Date getStartTime() {

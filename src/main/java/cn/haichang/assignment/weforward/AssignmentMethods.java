@@ -23,7 +23,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author HaiChang
@@ -49,9 +51,10 @@ public class AssignmentMethods {
     public AssignmentView create(AssignmentParam params) throws ApiException {
         String title = params.getTitle();
         String content = params.getContent();
-        List<String> handlers = params.getHandlers();
+        /**list 转 set*/
+        Set<String> handlers = new HashSet<>(params.getHandlers());
         String charger = params.getCharger();
-        String lableId = params.getLable().getId().toString();
+        String lableId = params.getLable();
         Date startTime = params.getStartTime();
         Date endTime = params.getEndTime();
         int level = params.getLevel();
@@ -88,10 +91,10 @@ public class AssignmentMethods {
         if (!StringUtil.isEmpty(content)){
             assignment.setContent(content);
         }
-        assignment.addHandler(params.getHandlers());
+        assignment.addHandler(new HashSet<>(params.getHandlers()));
         assignment.addFollower(params.getFollowers());
         assignment.setCharger(params.getCharger());
-        assignment.setLableId(params.getLable().getId().toString());
+        assignment.setLableId(params.getLable());
         assignment.setStartTime(params.getStartTime());
         assignment.setEndTime(params.getEndTime());
         int level = params.getLevel();
@@ -110,7 +113,7 @@ public class AssignmentMethods {
         /*状态扭转*/
         int state = params.getState();
         if (assignment.getState().id != state){
-            assignment.changState(state);
+            assignment.changeState(state);
         }
         return AssignmentView.valueOf(assignment);
     }

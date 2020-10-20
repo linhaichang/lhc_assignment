@@ -11,6 +11,7 @@ import cn.weforward.data.persister.PersisterFactory;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author HaiChang
@@ -24,7 +25,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
 
     @Override
     public Assignment createAssignment(String title, String content,
-                                       String creator, List<String> handlers,
+                                       String creator, Set<String> handlers,
                                        String charger, String lableId, Date startTime,
                                        Date endTime, int level) {
         return new AssignmentImpl(this, title, content/*, creator*/, handlers, charger, lableId, startTime, endTime, level);
@@ -69,9 +70,9 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         if (null == assignment) {
             return false;
         }
-        List<String> handler = assignment.getHandler();
+        Set<String> handler = assignment.getHandler();
         String charger = assignment.getCharger();
-        List<String> follower = assignment.getFollower();
+        Set<String> follower = assignment.getFollower();
         if (handler.isEmpty() && charger.isEmpty() && follower.isEmpty()) {
             return false;
         }
