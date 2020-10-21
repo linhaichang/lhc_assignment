@@ -7,6 +7,7 @@ import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
 import cn.weforward.data.persister.PersisterFactory;
+import cn.weforward.data.persister.ext.ConditionUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -62,9 +63,25 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     }
 
     @Override
+    public ResultPage<Lable> getAllLables() {
+        ResultPage<? extends Lable> rp = m_PsLable.startsWith("");
+        List<Lable> list = new ArrayList<>();
+        for (Lable lable : ResultPageHelper.toForeach(rp)) {
+            list.add(lable);
+        }
+        return ResultPageHelper.toResultPage(list);
+    }
+
+    @Override
     public boolean deleteLable(String lableId) {
         return m_PsLable.remove(lableId);
     }
+
+    /*wait!!!!!!!!!!!!!!!!!!!!!!!!*/
+//    @Override
+//    public ResultPage<AssignmentImpl> getAssignmentsByLableId(String lableId) {
+//        return m_PsAssignment.search(ConditionUtil.eq("lable_Id", lableId));
+//    }
 
 
     private static boolean isMatch(Assignment assignment, String personName, int personType) {

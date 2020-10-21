@@ -1,5 +1,6 @@
 package cn.haichang.assignment;
 
+import cn.haichang.assignment.impl.AssignmentImpl;
 import cn.weforward.common.ResultPage;
 import cn.weforward.data.UniteId;
 
@@ -25,6 +26,9 @@ public interface AssignmentService {
     ResultPage<Assignment> searchAssignment(String personName,int personType,int assignmentState);
     Lable createLable(String lableName);
     Lable getLable(String lableId);
+    ResultPage<Lable> getAllLables();
     boolean deleteLable(String lableId);
+//    ResultPage<AssignmentImpl> getAssignmentsByLableId(String lableId);
+
 
 }

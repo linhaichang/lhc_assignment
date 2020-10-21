@@ -45,6 +45,8 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     @Resource
     protected Date m_CreateTime;
     @Resource
+    protected Date m_FinishTime;
+    @Resource
     public int m_State;
     @Resource
     protected int m_Level;
@@ -69,7 +71,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Creator= Global.TLS.getValue("creator");
         m_Handlers=handler;
         m_Charger=charger;
-        m_Followers=null;
+        m_Followers=new HashSet<>();
         m_LableId=lableId;
         m_StartTime=startTime;
         m_EndTime=endTime;
@@ -98,7 +100,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Creator= Global.TLS.getValue("creator");
         m_Handlers = handlers;
         m_Charger = charger;
-        m_Followers=null;
+        m_Followers=new HashSet<>();
         m_LableId = lableId;
         m_StartTime = startTime;
         m_EndTime = endTime;
@@ -156,6 +158,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
 
     @Override
     public void addFollower(String follower) {
+        System.out.println(follower);
         if (null ==follower){
             return;
         }
@@ -248,30 +251,40 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     @Override
+    public Date getFinishTime() {
+        return m_FinishTime;
+    }
+
+    @Override
+    public NameItem getLevel() {
+        return LEVELS.get(m_Level);
+    }
+
+    @Override
     public NameItem getState() {
         return STATES.get(m_State) ;
     }
 
     static {
-        /*评估中：-》规划中，已拒绝，*/
+        /*评估中 0 ：-》规划中，已拒绝，*/
         hashMap.put(STATE_ESTIMATE.id, Arrays.asList(STATE_PLAN.id,STATE_REJECT.id));
-        /*规划中：-》待开发，已拒绝，挂起*/
+        /*规划中 1 ：-》待开发，已拒绝，挂起*/
         hashMap.put(STATE_PLAN.id, Arrays.asList(STATE_WAIT_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*待开发：-》开发中，已拒绝，挂起*/
+        /*待开发 2：-》开发中，已拒绝，挂起*/
         hashMap.put(STATE_WAIT_DEVELOP.id, Arrays.asList(STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*开发中：-》待测试，已拒绝，挂起*/
+        /*开发中 3：-》待测试，已拒绝，挂起*/
         hashMap.put(STATE_DEVELOP.id, Arrays.asList(STATE_WAIT_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*待测试：-》开发中，测试中，已拒绝，挂起*/
+        /*待测试 4：-》开发中，测试中，已拒绝，挂起*/
         hashMap.put(STATE_WAIT_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_TEST,STATE_REJECT.id,STATE_PENDING.id));
-        /*测试中：-》开发中，测试通过，已拒绝，挂起*/
+        /*测试中 5：-》开发中，测试通过，已拒绝，挂起*/
         hashMap.put(STATE_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_PASS_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*测试通过：-》开发中，已上线，已拒绝，挂起，*/
+        /*测试通过 6：-》开发中，已上线，已拒绝，挂起，*/
         hashMap.put(STATE_PASS_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*以上线：-》无 */
+        /*以上线 7：-》无 */
         hashMap.put(STATE_ONLINE.id, Arrays.asList());
-        /*已拒绝：-》无 */
+        /*已拒绝 8：-》无 */
         hashMap.put(STATE_REJECT.id, Arrays.asList());
-        /*挂起：-》评估中，待开发，待测试，测试通过，已拒绝，*/
+        /*挂起 9：-》评估中，待开发，待测试，测试通过，已拒绝，*/
         hashMap.put(STATE_PENDING.id, Arrays.asList(STATE_ESTIMATE.id,STATE_DEVELOP.id,STATE_WAIT_TEST.id,STATE_PASS_TEST.id,STATE_REJECT.id));
     }
     @Override
@@ -279,6 +292,9 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         List list = hashMap.get(getState().id);
         if (list.contains(stateId)) {
             m_State = stateId;
+            if (stateId == 7 || stateId == 8){
+                m_FinishTime = new Date();
+            }
         }
         markPersistenceUpdate();
     }

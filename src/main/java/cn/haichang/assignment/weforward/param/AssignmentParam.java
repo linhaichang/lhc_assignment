@@ -100,4 +100,7 @@ public class AssignmentParam {
     public int getState() {
         return m_State;
     }
+    public void setState(int state){
+        m_State = state;
+    }
 }

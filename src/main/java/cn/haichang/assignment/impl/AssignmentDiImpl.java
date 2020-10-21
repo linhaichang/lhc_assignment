@@ -43,6 +43,9 @@ public class AssignmentDiImpl implements AssignmentDi {
 
     @Override
     public ResultPage<AssignmentImpl> searchAssignmentByLableId(String lableId) {
-        return m_PsAssignment.search(ConditionUtil.eq("m_LableId", lableId));
+        System.out.println(lableId);
+        ResultPage<AssignmentImpl> assignments = m_PsAssignment.search(
+                ConditionUtil.eq(ConditionUtil.field("lableId"), lableId));
+        return assignments;
     }
 }

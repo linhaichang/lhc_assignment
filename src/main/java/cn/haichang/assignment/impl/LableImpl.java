@@ -59,7 +59,7 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
 
     @Override
     public ResultPage<AssignmentImpl> getAssignments() {
-        ResultPage<AssignmentImpl> assignments = getBusinessDi().searchAssignmentByLableId(getId().getId());
+        ResultPage<AssignmentImpl> assignments = getBusinessDi().searchAssignmentByLableId(getId().getOrdinal());
         return assignments;
     }
 

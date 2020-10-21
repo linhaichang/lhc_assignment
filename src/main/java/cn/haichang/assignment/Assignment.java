@@ -82,7 +82,9 @@ public interface Assignment {
     Date getStartTime();
     Date getEndTime();
     Date getCreateTime();
+    Date getFinishTime();
 
+    NameItem getLevel();
     NameItem getState();
 
     void changeState(int stateId) throws ApiException;

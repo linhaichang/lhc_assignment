@@ -56,8 +56,13 @@ public class AssignmentView {
         return m_Assignment.getCharger();
     }
 
+    @DocAttribute(description = "创建人")
+    public String getCreator(){
+        return m_Assignment.getCreator();
+    }
+
     @DocAttribute(description = "任务标签")
-    public String  getLableId() {
+    public String getLableId() {
         return m_Assignment.getLable();
     }
 
@@ -76,6 +81,11 @@ public class AssignmentView {
         return m_Assignment.getCreateTime();
     }
 
+    @DocAttribute(description = "任务完成时间")
+    public Date getFinishTime(){
+        return m_Assignment.getFinishTime();
+    }
+
     @DocAttribute(description = "任务状态")
     public int getState() {
         return m_Assignment.getState().id;
@@ -84,6 +94,11 @@ public class AssignmentView {
     @DocAttribute(description = "任务状态描述")
     public String getStateDesc(){
         return m_Assignment.getState().getName();
+    }
+
+    @DocAttribute(description = "优先级")
+    public String  getLevel(){
+        return m_Assignment.getLevel().getName();
     }
 
 

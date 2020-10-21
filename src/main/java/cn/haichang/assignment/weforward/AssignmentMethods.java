@@ -3,9 +3,11 @@ package cn.haichang.assignment.weforward;
 import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.AssignmentService;
 import cn.haichang.assignment.Lable;
+import cn.haichang.assignment.impl.AssignmentImpl;
 import cn.haichang.assignment.weforward.param.AssignmentParam;
 import cn.haichang.assignment.weforward.param.UpdateAssignmentParam;
 import cn.haichang.assignment.weforward.view.AssignmentView;
+import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;
 import cn.weforward.framework.ApiException;
 import cn.weforward.framework.KeepServiceOrigin;
@@ -59,7 +61,6 @@ public class AssignmentMethods {
         Date startTime = params.getStartTime();
         Date endTime = params.getEndTime();
         int level = params.getLevel();
-        System.out.println(level);
         ValidateUtil.isEmpty(title, "标题不能为空");
         ValidateUtil.isEmpty(content, "内容不能为空");
         Assignment assignment = m_AssignmentService.createAssignment(title
@@ -71,20 +72,27 @@ public class AssignmentMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "获取任务",index = 1)
+    @DocMethod(description = "通过任务id获取任务",index = 1)
     public AssignmentView get(FriendlyObject params){
-        System.out.println("beforeGet");
         Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        System.out.println("afterGet"+assignment.toString());
         return AssignmentView.valueOf(assignment);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocMethod(description = "更新任务" , index = 2)
+    @DocParameter(@DocAttribute(name = "LableId",type = String.class,necessary = true,description = "标签id"))
+    @DocMethod(description = "通过标签id获取任务",index = 2)
+    public ResultPage<AssignmentImpl> getByLableId(FriendlyObject params){
+        Lable lableId = m_AssignmentService.getLable(params.getString("LableId"));
+        return lableId.getAssignments();
+    }
+
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocMethod(description = "更新任务" , index = 3)
     public AssignmentView update(UpdateAssignmentParam params) throws ApiException {
         Assignment assignment = m_AssignmentService.getAssignment(params.getId());
-        assignment = check(assignment);
+
         if (null == assignment){
             return null;
         }
@@ -92,13 +100,16 @@ public class AssignmentMethods {
         if (!StringUtil.isEmpty(title)){
             assignment.setTitle(title);
         }
+
         String content = params.getContent();
         if (!StringUtil.isEmpty(content)){
             assignment.setContent(content);
         }
+
         assignment.addHandler(new HashSet<>(params.getHandlers()));
         assignment.addFollower(params.getFollowers());
         assignment.setCharger(params.getCharger());
+        /*修改标签*/
         assignment.setLableId(params.getLableId());
         assignment.setStartTime(params.getStartTime());
         assignment.setEndTime(params.getEndTime());
@@ -123,13 +134,13 @@ public class AssignmentMethods {
         return AssignmentView.valueOf(assignment);
     }
 
-    private Assignment check(Assignment assignment){
-        if (null == assignment){
-            return null;
-        }
-        if (!StringUtil.eq(assignment.getCreator(), getCreator())){
-            return null;
-        }
-        return assignment;
-    }
+//    private Assignment check(Assignment assignment){
+//        if (null == assignment){
+//            return null;
+//        }
+//        if (!StringUtil.eq(assignment.getCreator(), getCreator())){
+//            return null;
+//        }
+//        return assignment;
+//    }
 }
