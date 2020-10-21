@@ -54,10 +54,12 @@ public class AssignmentMethods {
         /**list 转 set*/
         Set<String> handlers = new HashSet<>(params.getHandlers());
         String charger = params.getCharger();
-        String lableId = params.getLable();
+        String lableId = params.getLableId();
+        System.out.println(lableId);
         Date startTime = params.getStartTime();
         Date endTime = params.getEndTime();
         int level = params.getLevel();
+        System.out.println(level);
         ValidateUtil.isEmpty(title, "标题不能为空");
         ValidateUtil.isEmpty(content, "内容不能为空");
         Assignment assignment = m_AssignmentService.createAssignment(title
@@ -68,10 +70,13 @@ public class AssignmentMethods {
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "id",type = String.class,necessary = true,description = "任务isd"))
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
     @DocMethod(description = "获取任务",index = 1)
     public AssignmentView get(FriendlyObject params){
-        return AssignmentView.valueOf(check(m_AssignmentService.getAssignment(params.getString("id"))));
+        System.out.println("beforeGet");
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        System.out.println("afterGet"+assignment.toString());
+        return AssignmentView.valueOf(assignment);
     }
 
     @KeepServiceOrigin
@@ -94,7 +99,7 @@ public class AssignmentMethods {
         assignment.addHandler(new HashSet<>(params.getHandlers()));
         assignment.addFollower(params.getFollowers());
         assignment.setCharger(params.getCharger());
-        assignment.setLableId(params.getLable());
+        assignment.setLableId(params.getLableId());
         assignment.setStartTime(params.getStartTime());
         assignment.setEndTime(params.getEndTime());
         int level = params.getLevel();
@@ -127,7 +132,4 @@ public class AssignmentMethods {
         }
         return assignment;
     }
-
-
-
 }

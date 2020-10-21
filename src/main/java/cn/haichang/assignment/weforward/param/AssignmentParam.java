@@ -66,12 +66,12 @@ public class AssignmentParam {
         this.m_Charger = m_Charger;
     }
     @DocAttribute(necessary = true,description = "标签",example = "内务大厅")
-    public String getLable() {
+    public String getLableId() {
         return m_LableId;
     }
 
-    public void setLable(String Id) {
-        this.m_LableId = m_LableId;
+    public void setLableId(String lableId) {
+        this.m_LableId = lableId;
     }
     @DocAttribute(necessary = true,description = "起始时间",example = "2019-10-29T00:30:00.666Z")
     public Date getStartTime() {
@@ -92,6 +92,9 @@ public class AssignmentParam {
     @DocAttribute(necessary = true,description = "优先级",example = "10")
     public int getLevel() {
         return m_Level;
+    }
+    public void setLevel(int level){
+        this.m_Level = level;
     }
 
     public int getState() {

@@ -77,7 +77,9 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Level=level;
         m_CreateTime=new Date();
         m_FatherID=null;
+        System.out.println("刷新前ass");
         markPersistenceUpdate();
+        System.out.println("刷新后ass");
     }
 
     /**

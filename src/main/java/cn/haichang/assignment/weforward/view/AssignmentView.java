@@ -57,7 +57,7 @@ public class AssignmentView {
     }
 
     @DocAttribute(description = "任务标签")
-    public String  getLable() {
+    public String  getLableId() {
         return m_Assignment.getLable();
     }
 

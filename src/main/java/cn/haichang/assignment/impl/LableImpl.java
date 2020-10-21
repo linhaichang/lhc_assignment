@@ -36,7 +36,9 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
         super(di);
         genPersistenceId(lableName);
         m_LableName = lableName;
+        System.out.println("刷新前lable");
         markPersistenceUpdate();
+        System.out.println("刷新后lable");
     }
 
     @Override

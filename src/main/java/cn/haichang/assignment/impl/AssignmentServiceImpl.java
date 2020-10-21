@@ -28,6 +28,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
                                        String creator, Set<String> handlers,
                                        String charger, String lableId, Date startTime,
                                        Date endTime, int level) {
+        System.out.println("我是serverImpl——createAss");
         return new AssignmentImpl(this, title, content/*, creator*/, handlers, charger, lableId, startTime, endTime, level);
     }
 
