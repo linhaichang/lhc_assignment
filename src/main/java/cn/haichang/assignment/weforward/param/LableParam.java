@@ -25,7 +25,5 @@ public class LableParam {
     }
     public void setLableId(String lableId){
         m_LableId = lableId;
-        System.out.println(" lableParam下的setId");
     }
-
 }

@@ -5,6 +5,7 @@ import cn.haichang.assignment.AssignmentService;
 import cn.haichang.assignment.Lable;
 import cn.haichang.assignment.impl.AssignmentImpl;
 import cn.haichang.assignment.weforward.param.AssignmentParam;
+import cn.haichang.assignment.weforward.param.ConditionQueryAssignmentParam;
 import cn.haichang.assignment.weforward.param.SonAssignmentParam;
 import cn.haichang.assignment.weforward.param.UpdateAssignmentParam;
 import cn.haichang.assignment.weforward.view.AssignmentView;
@@ -119,14 +120,25 @@ public class AssignmentMethods {
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocMethod(description = "获取所有任务" , index = 5)
+    @DocMethod(description = "通过条件查询获取任务",index = 5)
+    public ResultPage<Assignment> getByCondition(ConditionQueryAssignmentParam params){
+        String personName = params.getPersonName();
+        int personType = params.getPersonType();
+        int conditionState = params.getConditionState();
+        return m_AssignmentService.searchAssignment(personName,personType,conditionState);
+    }
+
+
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocMethod(description = "获取所有任务" , index = 6)
     public ResultPage<Assignment> getAllAssignment(){
         return m_AssignmentService.getAllAssignments();
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocMethod(description = "更新任务" , index = 6)
+    @DocMethod(description = "更新任务" , index = 7)
     public AssignmentView update(UpdateAssignmentParam params) throws ApiException {
         Assignment assignment = m_AssignmentService.getAssignment(params.getId());
 
@@ -174,7 +186,7 @@ public class AssignmentMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "AssignmentId", type = String.class,necessary = true, description = "待删除的任务Id"))
-    @DocMethod(description = "删除任务", index = 7)
+    @DocMethod(description = "删除任务", index = 8)
     public String delete(FriendlyObject params) throws ApiException {
         m_AssignmentService.deleteaAssignment(params.getString("AssignmentId"));
         return "删除成功";

@@ -49,16 +49,15 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
 
     @Override
     public ResultPage<Assignment> searchAssignment(String personName,int personType,int assignmentState) {
-        ResultPage<? extends Assignment> resultPage = m_PsAssignment.startsWith(personName);
+        ResultPage<? extends Assignment> resultPage = m_PsAssignment.startsWith("");
         List<Assignment> assignmentList = new ArrayList<>();
         for (Assignment assignment : ResultPageHelper.toForeach(resultPage)) {
             if (isMatch(assignment, personName, personType)){
-                continue;
+                if (isMatch(assignment, assignmentState)){
+                    assignmentList.add(assignment);
+                    continue;
+                }
             }
-            if (isMatch(assignment, assignmentState)){
-                continue;
-            }
-            assignmentList.add(assignment);
         }
         return ResultPageHelper.toResultPage(assignmentList);
     }
@@ -122,13 +121,6 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         }
         return ResultPageHelper.toResultPage(list);
     }
-
-    /*wait!!!!!!!!!!!!!!!!!!!!!!!!*/
-//    @Override
-//    public ResultPage<AssignmentImpl> getAssignmentsByLableId(String lableId) {
-//        return m_PsAssignment.search(ConditionUtil.eq("lable_Id", lableId));
-//    }
-
 
     private static boolean isMatch(Assignment assignment, String personName, int personType) {
         if (null == assignment) {
