@@ -5,6 +5,7 @@ import cn.haichang.assignment.AssignmentService;
 import cn.haichang.assignment.Lable;
 import cn.haichang.assignment.impl.AssignmentImpl;
 import cn.haichang.assignment.weforward.param.AssignmentParam;
+import cn.haichang.assignment.weforward.param.SonAssignmentParam;
 import cn.haichang.assignment.weforward.param.UpdateAssignmentParam;
 import cn.haichang.assignment.weforward.view.AssignmentView;
 import cn.weforward.common.ResultPage;
@@ -69,10 +70,31 @@ public class AssignmentMethods {
         return AssignmentView.valueOf(assignment);
     }
 
+    @WeforwardMethod
+    @DocMethod(description = "创建子任务",index = 1)
+    public AssignmentView createSon(SonAssignmentParam params) throws ApiException {
+        String title = params.getTitle();
+        String content = params.getContent();
+        /**list 转 set*/
+        Set<String> handlers = new HashSet<>(params.getHandlers());
+        String charger = params.getCharger();
+        String lableId = params.getLableId();
+        Date startTime = params.getStartTime();
+        Date endTime = params.getEndTime();
+        String fatherId = params.getFatherId();
+        int level = params.getLevel();
+        ValidateUtil.isEmpty(title, "标题不能为空");
+        ValidateUtil.isEmpty(content, "内容不能为空");
+        Assignment assignment = m_AssignmentService.createAssignmentSon(title
+                , content, getCreator(), handlers, charger, lableId, startTime
+                ,endTime,level,fatherId);
+        return AssignmentView.valueOf(assignment);
+    }
+
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "通过任务id获取任务",index = 1)
+    @DocMethod(description = "通过任务id获取任务",index = 2)
     public AssignmentView get(FriendlyObject params){
         Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
         return AssignmentView.valueOf(assignment);
@@ -81,7 +103,7 @@ public class AssignmentMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "LableId",type = String.class,necessary = true,description = "标签id"))
-    @DocMethod(description = "通过标签id获取任务",index = 2)
+    @DocMethod(description = "通过标签id获取任务",index = 3)
     public ResultPage<AssignmentImpl> getByLableId(FriendlyObject params){
         Lable lableId = m_AssignmentService.getLable(params.getString("LableId"));
         return lableId.getAssignments();
@@ -89,7 +111,22 @@ public class AssignmentMethods {
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocMethod(description = "更新任务" , index = 3)
+    @DocParameter(@DocAttribute(name = "fatherId",type = String.class,necessary = true,description = "父id"))
+    @DocMethod(description = "通过父id获取子任务",index = 4)
+    public ResultPage<Assignment> getByfahterId(FriendlyObject params){
+        return m_AssignmentService.getSonAssignments(params.getString("fatherId"));
+    }
+
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocMethod(description = "获取所有任务" , index = 5)
+    public ResultPage<Assignment> getAllAssignment(){
+        return m_AssignmentService.getAllAssignments();
+    }
+
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocMethod(description = "更新任务" , index = 6)
     public AssignmentView update(UpdateAssignmentParam params) throws ApiException {
         Assignment assignment = m_AssignmentService.getAssignment(params.getId());
 
@@ -134,13 +171,13 @@ public class AssignmentMethods {
         return AssignmentView.valueOf(assignment);
     }
 
-//    private Assignment check(Assignment assignment){
-//        if (null == assignment){
-//            return null;
-//        }
-//        if (!StringUtil.eq(assignment.getCreator(), getCreator())){
-//            return null;
-//        }
-//        return assignment;
-//    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId", type = String.class,necessary = true, description = "待删除的任务Id"))
+    @DocMethod(description = "删除任务", index = 7)
+    public String delete(FriendlyObject params) throws ApiException {
+        m_AssignmentService.deleteaAssignment(params.getString("AssignmentId"));
+        return "删除成功";
+    }
+
 }

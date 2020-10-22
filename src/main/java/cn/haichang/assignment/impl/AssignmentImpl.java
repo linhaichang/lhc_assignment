@@ -51,7 +51,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     @Resource
     protected int m_Level;
     @Resource
-    protected UniteId m_FatherID;
+    protected String m_FatherID;
     /*保存状态扭转的规则*/
     private static HashMap<Integer,List> hashMap = new HashMap<>();
 //    private static final SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -61,7 +61,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     public AssignmentImpl(AssignmentDi di,String title,String content,
-                          /*String creator,*/Set<String> handler,
+                          /*String creator,*/Set<String> handlers,
                           String charger,String lableId,Date startTime,
                           Date endTime,int level){
         super(di);
@@ -69,7 +69,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Title=title;
         m_Content=content;
         m_Creator= Global.TLS.getValue("creator");
-        m_Handlers=handler;
+        m_Handlers=handlers;
         m_Charger=charger;
         m_Followers=new HashSet<>();
         m_LableId=lableId;
@@ -92,9 +92,9 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     public AssignmentImpl(AssignmentDi di, String title, String content,
                           Set<String> handlers, String charger,
                           String lableId, Date startTime, Date endTime,
-                          int level, UniteId fatherID/*String creator*/) {
+                          int level, String fatherId/*String creator*/) {
         super(di);
-        genPersistenceId(fatherID.getId());
+        genPersistenceId(fatherId);
         m_Title = title;
         m_Content = content;
         m_Creator= Global.TLS.getValue("creator");
@@ -107,7 +107,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_State = STATE_ESTIMATE.id;
         m_Level = level;
         m_CreateTime=new Date();
-        m_FatherID = fatherID;
+        m_FatherID = fatherId;
         markPersistenceUpdate();
     }
 
@@ -265,6 +265,11 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         return STATES.get(m_State) ;
     }
 
+    @Override
+    public String getFatherId() {
+        return m_FatherID;
+    }
+
     static {
         /*评估中 0 ：-》规划中，已拒绝，*/
         hashMap.put(STATE_ESTIMATE.id, Arrays.asList(STATE_PLAN.id,STATE_REJECT.id));
@@ -296,8 +301,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                 m_FinishTime = new Date();
             }
         }
+        else {
+            throw new ApiException(202, "状态扭转错误");
+        }
         markPersistenceUpdate();
     }
+
 
     @Override
     public void LevelHighest() {
@@ -320,6 +329,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     @Override
     public void LevelLow() {
         m_Level= OPTION_LEVEL_LOW.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void delete() {
+        m_State = STATE_DELETE.id;
         markPersistenceUpdate();
     }
 }

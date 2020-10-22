@@ -96,11 +96,12 @@ public class AssignmentParam {
     public void setLevel(int level){
         this.m_Level = level;
     }
-
+    @DocAttribute(necessary = true,description = "任务状态",example = "0-9")
     public int getState() {
         return m_State;
     }
     public void setState(int state){
         m_State = state;
     }
+
 }

@@ -36,9 +36,11 @@ public interface Assignment {
     NameItem STATE_REJECT = NameItem.valueOf("已拒绝", 8);
     /** 状态-挂起*/
     NameItem STATE_PENDING = NameItem.valueOf("挂起", 9);
+    /* 状态-任务删除*/
+    NameItem STATE_DELETE = NameItem.valueOf("删除", 14);
     /** 状态-全部*/
     NameItems STATES = NameItems.valueOf(STATE_ESTIMATE,STATE_PLAN,STATE_WAIT_DEVELOP,STATE_DEVELOP,
-            STATE_WAIT_TEST,STATE_TEST,STATE_PASS_TEST,STATE_ONLINE,STATE_REJECT,STATE_PENDING);
+            STATE_WAIT_TEST,STATE_TEST,STATE_PASS_TEST,STATE_ONLINE,STATE_REJECT,STATE_PENDING,STATE_DELETE);
 
     /** 优先级-最高优先*/
     NameItem OPTION_LEVEL_HIGHEST = NameItem.valueOf("最高优先", 10);
@@ -50,6 +52,7 @@ public interface Assignment {
     NameItem OPTION_LEVEL_LOW = NameItem.valueOf("低", 13);
     /** 优先级-全部*/
     NameItems LEVELS = NameItems.valueOf(OPTION_LEVEL_HIGHEST,OPTION_LEVEL_HIGH,OPTION_LEVEL_MIDDLE,OPTION_LEVEL_LOW);
+
 
     /**
      * 唯一ID
@@ -87,11 +90,15 @@ public interface Assignment {
     NameItem getLevel();
     NameItem getState();
 
+    String getFatherId();
+
     void changeState(int stateId) throws ApiException;
 
     void LevelHighest();
     void LevelHigh();
     void LevelMiddle();
     void LevelLow();
+
+    void delete();
 
 }

@@ -8,6 +8,7 @@ import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
 import cn.weforward.data.persister.PersisterFactory;
 import cn.weforward.data.persister.ext.ConditionUtil;
+import cn.weforward.framework.ApiException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,14 +30,23 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
                                        String creator, Set<String> handlers,
                                        String charger, String lableId, Date startTime,
                                        Date endTime, int level) {
-        System.out.println("我是serverImpl——createAss");
         return new AssignmentImpl(this, title, content/*, creator*/, handlers, charger, lableId, startTime, endTime, level);
+    }
+
+    @Override
+    public Assignment createAssignmentSon(String title, String content, String creator,
+                                          Set<String> handlers, String charger,
+                                          String lableId, Date startTime,
+                                          Date endTime, int level, String fatherId) {
+        return new AssignmentImpl(this, title, content, handlers, charger
+        , lableId, startTime, endTime, level,fatherId);
     }
 
     @Override
     public Assignment getAssignment(String id) {
         return m_PsAssignment.get(id);
     }
+
     @Override
     public ResultPage<Assignment> searchAssignment(String personName,int personType,int assignmentState) {
         ResultPage<? extends Assignment> resultPage = m_PsAssignment.startsWith(personName);
@@ -52,6 +62,29 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         }
         return ResultPageHelper.toResultPage(assignmentList);
     }
+
+    @Override
+    public ResultPage<Assignment> getSonAssignments(String fatherId) {
+        ResultPage<? extends Assignment> rp = m_PsAssignment.startsWith(fatherId);
+        List<Assignment> list = new ArrayList<>();
+        for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
+            if (assignment.getFatherId() ==null || assignment.getFatherId().length() == 0){
+                continue;
+            }
+            list.add(assignment);
+        }
+        return ResultPageHelper.toResultPage(list);
+    }
+
+    @Override
+    public void deleteaAssignment(String id) throws ApiException {
+        if (null == m_PsAssignment.get(id)){
+            throw new ApiException(999, "无此任务");
+        }
+        AssignmentImpl assignment = m_PsAssignment.get(id);
+        assignment.delete();
+    }
+
     @Override
     public Lable createLable(String lableName) {
         return new LableImpl(this,lableName);
@@ -75,6 +108,19 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     @Override
     public boolean deleteLable(String lableId) {
         return m_PsLable.remove(lableId);
+    }
+
+    @Override
+    public ResultPage<Assignment> getAllAssignments() {
+        ResultPage<? extends Assignment> rp = m_PsAssignment.startsWith("");
+        List<Assignment> list = new ArrayList<>();
+        for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
+            if (assignment.getState().id == 14){
+                continue;
+            }
+            list.add(assignment);
+        }
+        return ResultPageHelper.toResultPage(list);
     }
 
     /*wait!!!!!!!!!!!!!!!!!!!!!!!!*/

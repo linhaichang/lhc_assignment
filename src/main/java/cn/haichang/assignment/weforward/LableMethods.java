@@ -37,6 +37,7 @@ public class LableMethods {
     protected AssignmentService m_AssignmentService;
 
     @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "LableName", type = String.class, necessary = true, description = "标签名"))
     @DocMethod(description = "新建标签",index = 0)
     public LableView create(LableParam params) throws ApiException {
         String lableName = params.getLableName();
@@ -44,7 +45,6 @@ public class LableMethods {
         Lable lable = m_AssignmentService.createLable(lableName);
         return LableView.valueOf(lable);
     }
-
 
     @KeepServiceOrigin
     @WeforwardMethod
@@ -57,19 +57,19 @@ public class LableMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "LableId", type = String.class,necessary = true, description = "标签Id"))
-    @DocMethod(description = "删除标签", index = 2)
+    @DocMethod(description = "删除标签", index = 4)
     public String delete(FriendlyObject params) throws ApiException {
-        Lable lable = m_AssignmentService.getLable(params.getString("LableId"));
-        if (null == lable){
-            return "无此标签";
+        if (null == m_AssignmentService.getLable(params.getString("LableId"))){
+            throw new ApiException(999,"无此标签");
         }
+        Lable lable = m_AssignmentService.getLable(params.getString("LableId"));
         /**
          * 判断此标签的任务数是否=0
          */
         int i =lable.getAssignments().getCount();
         System.out.println(i);
         if (lable.getAssignments().getCount() == 0 ){
-            boolean isDelete = m_AssignmentService.deleteLable(params.getString("LableId"));
+            m_AssignmentService.deleteLable(params.getString("LableId"));
         }else {
             throw new ApiException(123, "此标签下还有"+i+"条任务，不能删除");
         }
@@ -78,8 +78,8 @@ public class LableMethods {
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocMethod(description = "获取所有标签", index = 3)
-    public ResultPage<Lable> getAll(FriendlyObject params){
+    @DocMethod(description = "获取所有标签", index = 2)
+    public ResultPage<Lable> getAll(/*FriendlyObject params*/){
         return m_AssignmentService.getAllLables();
     }
 

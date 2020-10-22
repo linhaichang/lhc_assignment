@@ -3,6 +3,7 @@ package cn.haichang.assignment;
 import cn.haichang.assignment.impl.AssignmentImpl;
 import cn.weforward.common.ResultPage;
 import cn.weforward.data.UniteId;
+import cn.weforward.framework.ApiException;
 
 import java.util.Date;
 import java.util.List;
@@ -22,13 +23,19 @@ public interface AssignmentService {
     Assignment createAssignment(String title, String content,String creator, Set<String> handlers,
                                 String charger, String lableId, Date startTime,
                                 Date endTime,int level);
+    Assignment createAssignmentSon(String title, String content,String creator, Set<String> handlers,
+                                   String charger, String lableId, Date startTime,
+                                   Date endTime,int level,String fatherId);
     Assignment getAssignment(String id);
     ResultPage<Assignment> searchAssignment(String personName,int personType,int assignmentState);
+    ResultPage<Assignment> getSonAssignments(String fatherId);
+    void deleteaAssignment(String id) throws ApiException;
     Lable createLable(String lableName);
     Lable getLable(String lableId);
     ResultPage<Lable> getAllLables();
     boolean deleteLable(String lableId);
 //    ResultPage<AssignmentImpl> getAssignmentsByLableId(String lableId);
+    ResultPage<Assignment> getAllAssignments();
 
 
 }
