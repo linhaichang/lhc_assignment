@@ -36,11 +36,9 @@ public interface Assignment {
     NameItem STATE_REJECT = NameItem.valueOf("已拒绝", 8);
     /** 状态-挂起*/
     NameItem STATE_PENDING = NameItem.valueOf("挂起", 9);
-    /* 状态-任务删除*/
-    NameItem STATE_DELETE = NameItem.valueOf("删除", 14);
     /** 状态-全部*/
     NameItems STATES = NameItems.valueOf(STATE_ESTIMATE,STATE_PLAN,STATE_WAIT_DEVELOP,STATE_DEVELOP,
-            STATE_WAIT_TEST,STATE_TEST,STATE_PASS_TEST,STATE_ONLINE,STATE_REJECT,STATE_PENDING,STATE_DELETE);
+            STATE_WAIT_TEST,STATE_TEST,STATE_PASS_TEST,STATE_ONLINE,STATE_REJECT,STATE_PENDING);
 
     /** 优先级-最高优先*/
     NameItem OPTION_LEVEL_HIGHEST = NameItem.valueOf("最高优先", 10);
@@ -53,6 +51,8 @@ public interface Assignment {
     /** 优先级-全部*/
     NameItems LEVELS = NameItems.valueOf(OPTION_LEVEL_HIGHEST,OPTION_LEVEL_HIGH,OPTION_LEVEL_MIDDLE,OPTION_LEVEL_LOW);
 
+    /* 状态-任务是否删除*/
+    NameItem STATE_DELETE = NameItem.valueOf("删除", 14);
 
     /**
      * 唯一ID
@@ -92,7 +92,7 @@ public interface Assignment {
 
     String getFatherId();
 
-    void changeState(int stateId) throws ApiException;
+//    void changeState(int stateId) throws ApiException;
 
     void LevelHighest();
     void LevelHigh();
@@ -100,5 +100,17 @@ public interface Assignment {
     void LevelLow();
 
     void delete();
+    boolean isDelete();
+    /* 状态扭转*/
+    void turnEstimate() throws ApiException;
+    void turnPlanning() throws ApiException;
+    void turnWaitingDevelop() throws ApiException;
+    void turnDevelop() throws ApiException;
+    void turnWaitingTest() throws ApiException;
+    void turnTesting() throws ApiException;
+    void turnPassTest() throws ApiException;
+    void turnOnLine() throws ApiException;
+    void turnReject() throws ApiException;
+    void turnPending() throws ApiException;
 
 }

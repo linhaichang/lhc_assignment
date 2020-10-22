@@ -114,7 +114,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         ResultPage<? extends Assignment> rp = m_PsAssignment.startsWith("");
         List<Assignment> list = new ArrayList<>();
         for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
-            if (assignment.getState().id == 14){
+            if (assignment.isDelete()){
                 continue;
             }
             list.add(assignment);

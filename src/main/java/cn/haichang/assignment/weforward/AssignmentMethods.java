@@ -192,4 +192,98 @@ public class AssignmentMethods {
         return "删除成功";
     }
 
+
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至评估中",index = 9)
+    public AssignmentView turnEstimate(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnEstimate();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至规划中",index = 10)
+    public AssignmentView turnPlanning(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnPlanning();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至待开发",index = 11)
+    public AssignmentView turnWaitingDevelop(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnWaitingDevelop();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至开发中",index = 12)
+    public AssignmentView turnDevelop(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnDevelop();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至待测试",index = 13)
+    public AssignmentView turnWaitingTest(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnWaitingTest();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至测试中",index = 14)
+    public AssignmentView turnTesting(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnTesting();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至测试通过",index = 15)
+    public AssignmentView turnPassTest(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnPassTest();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至上线",index = 16)
+    public AssignmentView turnOnLine(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnOnLine();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至已拒绝",index = 17)
+    public AssignmentView turnReject(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnReject();
+        return AssignmentView.valueOf(assignment);
+    }
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至挂起",index = 18)
+    public AssignmentView turnPending(FriendlyObject params) throws ApiException {
+        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        assignment.turnPending();
+        return AssignmentView.valueOf(assignment);
+    }
+
+
+
 }

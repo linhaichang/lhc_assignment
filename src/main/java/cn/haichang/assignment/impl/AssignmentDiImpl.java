@@ -33,15 +33,6 @@ public class AssignmentDiImpl implements AssignmentDi {
     }
 
     @Override
-    public Assignment getAssignment(String id) {
-        return m_PsAssignment.get(id);
-    }
-    @Override
-    public Lable getLable(UniteId id) {
-        return m_PsLable.get(id);
-    }
-
-    @Override
     public ResultPage<AssignmentImpl> searchAssignmentByLableId(String lableId) {
         System.out.println(lableId);
         ResultPage<AssignmentImpl> assignments = m_PsAssignment.search(

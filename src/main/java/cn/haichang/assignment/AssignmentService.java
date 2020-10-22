@@ -37,5 +37,4 @@ public interface AssignmentService {
 //    ResultPage<AssignmentImpl> getAssignmentsByLableId(String lableId);
     ResultPage<Assignment> getAllAssignments();
 
-
 }

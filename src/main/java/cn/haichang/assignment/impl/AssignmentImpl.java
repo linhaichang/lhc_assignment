@@ -52,8 +52,10 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     protected int m_Level;
     @Resource
     protected String m_FatherID;
+    @Resource
+    protected int m_IsDelete;
     /*保存状态扭转的规则*/
-    private static HashMap<Integer,List> hashMap = new HashMap<>();
+//    private static HashMap<Integer,List> hashMap = new HashMap<>();
 //    private static final SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
     protected AssignmentImpl(AssignmentDi di) {
@@ -79,9 +81,8 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Level=level;
         m_CreateTime=new Date();
         m_FatherID=null;
-        System.out.println("刷新前ass");
+        m_IsDelete = 0;
         markPersistenceUpdate();
-        System.out.println("刷新后ass");
     }
 
     /**
@@ -108,6 +109,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Level = level;
         m_CreateTime=new Date();
         m_FatherID = fatherId;
+        m_IsDelete = 0;
         markPersistenceUpdate();
     }
 
@@ -270,42 +272,42 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         return m_FatherID;
     }
 
-    static {
-        /*评估中 0 ：-》规划中，已拒绝，*/
-        hashMap.put(STATE_ESTIMATE.id, Arrays.asList(STATE_PLAN.id,STATE_REJECT.id));
-        /*规划中 1 ：-》待开发，已拒绝，挂起*/
-        hashMap.put(STATE_PLAN.id, Arrays.asList(STATE_WAIT_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*待开发 2：-》开发中，已拒绝，挂起*/
-        hashMap.put(STATE_WAIT_DEVELOP.id, Arrays.asList(STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*开发中 3：-》待测试，已拒绝，挂起*/
-        hashMap.put(STATE_DEVELOP.id, Arrays.asList(STATE_WAIT_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*待测试 4：-》开发中，测试中，已拒绝，挂起*/
-        hashMap.put(STATE_WAIT_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_TEST,STATE_REJECT.id,STATE_PENDING.id));
-        /*测试中 5：-》开发中，测试通过，已拒绝，挂起*/
-        hashMap.put(STATE_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_PASS_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*测试通过 6：-》开发中，已上线，已拒绝，挂起，*/
-        hashMap.put(STATE_PASS_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-        /*以上线 7：-》无 */
-        hashMap.put(STATE_ONLINE.id, Arrays.asList());
-        /*已拒绝 8：-》无 */
-        hashMap.put(STATE_REJECT.id, Arrays.asList());
-        /*挂起 9：-》评估中，待开发，待测试，测试通过，已拒绝，*/
-        hashMap.put(STATE_PENDING.id, Arrays.asList(STATE_ESTIMATE.id,STATE_DEVELOP.id,STATE_WAIT_TEST.id,STATE_PASS_TEST.id,STATE_REJECT.id));
-    }
-    @Override
-    public void changeState(int stateId) throws ApiException {
-        List list = hashMap.get(getState().id);
-        if (list.contains(stateId)) {
-            m_State = stateId;
-            if (stateId == 7 || stateId == 8){
-                m_FinishTime = new Date();
-            }
-        }
-        else {
-            throw new ApiException(202, "状态扭转错误");
-        }
-        markPersistenceUpdate();
-    }
+//    static {
+//        /*评估中 0 ：-》规划中，已拒绝，*/
+//        hashMap.put(STATE_ESTIMATE.id, Arrays.asList(STATE_PLAN.id,STATE_REJECT.id));
+//        /*规划中 1 ：-》待开发，已拒绝，挂起*/
+//        hashMap.put(STATE_PLAN.id, Arrays.asList(STATE_WAIT_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
+//        /*待开发 2：-》开发中，已拒绝，挂起*/
+//        hashMap.put(STATE_WAIT_DEVELOP.id, Arrays.asList(STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
+//        /*开发中 3：-》待测试，已拒绝，挂起*/
+//        hashMap.put(STATE_DEVELOP.id, Arrays.asList(STATE_WAIT_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
+//        /*待测试 4：-》开发中，测试中，已拒绝，挂起*/
+//        hashMap.put(STATE_WAIT_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_TEST,STATE_REJECT.id,STATE_PENDING.id));
+//        /*测试中 5：-》开发中，测试通过，已拒绝，挂起*/
+//        hashMap.put(STATE_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_PASS_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
+//        /*测试通过 6：-》开发中，已上线，已拒绝，挂起，*/
+//        hashMap.put(STATE_PASS_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
+//        /*以上线 7：-》无 */
+//        hashMap.put(STATE_ONLINE.id, Arrays.asList());
+//        /*已拒绝 8：-》无 */
+//        hashMap.put(STATE_REJECT.id, Arrays.asList());
+//        /*挂起 9：-》评估中，待开发，待测试，测试通过，已拒绝，*/
+//        hashMap.put(STATE_PENDING.id, Arrays.asList(STATE_ESTIMATE.id,STATE_DEVELOP.id,STATE_WAIT_TEST.id,STATE_PASS_TEST.id,STATE_REJECT.id));
+//    }
+//    @Override
+//    public void changeState(int stateId) throws ApiException {
+//        List list = hashMap.get(getState().id);
+//        if (list.contains(stateId)) {
+//            m_State = stateId;
+//            if (stateId == 7 || stateId == 8){
+//                m_FinishTime = new Date();
+//            }
+//        }
+//        else {
+//            throw new ApiException(202, "状态扭转错误");
+//        }
+//        markPersistenceUpdate();
+//    }
 
 
     @Override
@@ -334,7 +336,177 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
 
     @Override
     public void delete() {
-        m_State = STATE_DELETE.id;
+        m_IsDelete = STATE_DELETE.id;
         markPersistenceUpdate();
     }
+
+    @Override
+    public boolean isDelete() {
+        if (STATE_DELETE.id == m_IsDelete){
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public void turnEstimate() throws ApiException {
+        NameItem state = getState();
+        if (STATE_ESTIMATE.id == state.id){
+            return;
+        }
+        if (STATE_PENDING.id != state.id ){
+            throw new ApiException(0, "非"+STATE_PENDING.getName()
+            +"的状态，不能扭转为"+STATE_ESTIMATE.getName());
+        }
+        m_State = STATE_ESTIMATE.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnPlanning() throws ApiException {
+        NameItem state = getState();
+        if (STATE_PLAN.id == state.id){
+            return;
+        }
+        if (STATE_ESTIMATE.id != state.id ){
+            throw new ApiException(0, "非"+STATE_ESTIMATE.getName()
+                    +"的状态，不能扭转为"+STATE_PLAN.getName());
+        }
+        m_State = STATE_PLAN.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnWaitingDevelop() throws ApiException {
+        NameItem state = getState();
+        if (STATE_WAIT_DEVELOP.id == state.id){
+            return;
+        }
+        if (STATE_PENDING.id != state.id && STATE_PLAN.id != state.id){
+            throw new ApiException(0, "非"+STATE_PENDING.getName()+"、"
+                    +STATE_PLAN.getName()
+                    +"的状态，不能扭转为"+STATE_WAIT_DEVELOP.getName());
+        }
+        m_State = STATE_WAIT_DEVELOP.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnDevelop() throws ApiException {
+        NameItem state = getState();
+        if (STATE_DEVELOP.id == state.id){
+            return;
+        }
+        if (STATE_WAIT_DEVELOP.id != state.id && STATE_WAIT_TEST.id != state.id &&
+        STATE_TEST.getName() != state.getName() && STATE_PASS_TEST.id != state.id){
+            throw new ApiException(0, "非"+STATE_WAIT_DEVELOP.getName()+"、"
+                    +STATE_WAIT_TEST.getName()+"、"+STATE_TEST.getName()+"、"
+                    +STATE_PASS_TEST.getName()
+                    +"的状态，不能扭转为"+STATE_DEVELOP.getName());
+        }
+        m_State = STATE_DEVELOP.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnWaitingTest() throws ApiException {
+        NameItem state = getState();
+        if (STATE_WAIT_TEST.id == state.id){
+            return;
+        }
+        if (STATE_DEVELOP.id != state.id && STATE_PENDING.id != state.id){
+            throw new ApiException(0, "非"+STATE_DEVELOP.getName()+"、"
+                    +STATE_PENDING.getName()
+                    +"的状态，不能扭转为"+STATE_WAIT_TEST.getName());
+        }
+        m_State = STATE_WAIT_TEST.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnTesting() throws ApiException {
+        NameItem state = getState();
+        if (STATE_TEST.id == state.id){
+            return;
+        }
+        if (STATE_WAIT_TEST.id != state.id){
+            throw new ApiException(0, "非"+STATE_WAIT_TEST.getName()
+                    +"的状态，不能扭转为"+STATE_TEST.getName());
+        }
+        m_State = STATE_TEST.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnPassTest() throws ApiException {
+        NameItem state = getState();
+        if (STATE_PASS_TEST.id == state.id){
+            return;
+        }
+        if (STATE_TEST.id != state.id && STATE_PENDING.id != state.id){
+            throw new ApiException(0, "非"+STATE_TEST.getName()+"、"
+                    +STATE_PENDING.getName()
+                    +"的状态，不能扭转为"+STATE_PASS_TEST.getName());
+        }
+        m_State = STATE_PASS_TEST.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnOnLine() throws ApiException {
+        NameItem state = getState();
+        if (STATE_ONLINE.id == state.id){
+            return;
+        }
+        if (STATE_PASS_TEST.id != state.id){
+            throw new ApiException(0, "非"+STATE_PASS_TEST.getName()
+                    +"的状态，不能扭转为"+STATE_ONLINE.getName());
+        }
+        m_State = STATE_ONLINE.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnReject() throws ApiException {
+        NameItem state = getState();
+        if (STATE_REJECT.id == state.id){
+            return;
+        }
+        if (STATE_ESTIMATE.id != state.id && STATE_PLAN.id != state.id &&
+        STATE_WAIT_DEVELOP.id != state.id && STATE_DEVELOP.id != state.id &&
+        STATE_WAIT_TEST.id != state.id && STATE_TEST.id != state.id &&
+        STATE_PASS_TEST.id != state.id && STATE_PENDING.id != state.id){
+            throw new ApiException(0, "非"
+                    +STATE_ESTIMATE.getName()+"、"
+                    +STATE_PLAN.getName()+"、"+STATE_WAIT_DEVELOP.getName()+"、"
+                    +STATE_DEVELOP.getName()+"、"+STATE_WAIT_TEST.getName()+"、"
+                    +STATE_TEST.getName()+"、"+STATE_PASS_TEST.getName()+"、"
+                    +STATE_PENDING.getName()
+                    +"的状态，不能扭转为"+STATE_REJECT.getName());
+        }
+        m_State = STATE_REJECT.id;
+        markPersistenceUpdate();
+    }
+
+    @Override
+    public void turnPending() throws ApiException {
+        NameItem state = getState();
+        if (STATE_PENDING.id == state.id){
+            return;
+        }
+        if (STATE_PLAN.id != state.id &&
+                STATE_WAIT_DEVELOP.id != state.id && STATE_DEVELOP.id != state.id &&
+                STATE_WAIT_TEST.id != state.id && STATE_TEST.id != state.id &&
+                STATE_PASS_TEST.id != state.id ){
+            throw new ApiException(0, "非"
+                    +STATE_PLAN.getName()+"、"+STATE_WAIT_DEVELOP.getName()+"、"
+                    +STATE_DEVELOP.getName()+"、"+STATE_WAIT_TEST.getName()+"、"
+                    +STATE_TEST.getName()+"、"+STATE_PASS_TEST.getName()+"、"
+                    +"的状态，不能扭转为"+STATE_PENDING.getName());
+        }
+        m_State = STATE_PENDING.id;
+        markPersistenceUpdate();
+    }
+
 }
