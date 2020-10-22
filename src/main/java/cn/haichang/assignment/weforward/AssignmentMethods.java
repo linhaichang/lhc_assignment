@@ -59,7 +59,6 @@ public class AssignmentMethods {
         Set<String> handlers = new HashSet<>(params.getHandlers());
         String charger = params.getCharger();
         String lableId = params.getLableId();
-        System.out.println(lableId);
         Date startTime = params.getStartTime();
         Date endTime = params.getEndTime();
         int level = params.getLevel();
@@ -128,7 +127,6 @@ public class AssignmentMethods {
         return m_AssignmentService.searchAssignment(personName,personType,conditionState);
     }
 
-
     @KeepServiceOrigin
     @WeforwardMethod
     @DocMethod(description = "获取所有任务" , index = 6)
@@ -176,10 +174,7 @@ public class AssignmentMethods {
             assignment.LevelLow();
         }
         /*状态扭转*/
-        int state = params.getState();
-        if (assignment.getState().id != state){
-            assignment.changeState(state);
-        }
+
         return AssignmentView.valueOf(assignment);
     }
 

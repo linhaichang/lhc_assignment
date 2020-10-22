@@ -1,6 +1,7 @@
 package cn.haichang.assignment;
 
 import cn.haichang.assignment.impl.AssignmentImpl;
+import cn.haichang.assignment.weforward.Bug;
 import cn.weforward.common.ResultPage;
 import cn.weforward.data.UniteId;
 import cn.weforward.framework.ApiException;
@@ -36,5 +37,11 @@ public interface AssignmentService {
     boolean deleteLable(String lableId);
 //    ResultPage<AssignmentImpl> getAssignmentsByLableId(String lableId);
     ResultPage<Assignment> getAllAssignments();
+
+    Bug createBug(String assignmentId,
+                  String bugContent, int severity,
+                  Set<String> tester, String versionAndPlatform);
+
+    ResultPage<Bug> getBugByAssignmentId(String AssignmentId);
 
 }

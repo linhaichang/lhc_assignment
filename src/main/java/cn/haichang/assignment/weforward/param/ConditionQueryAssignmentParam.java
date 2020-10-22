@@ -32,7 +32,7 @@ public class ConditionQueryAssignmentParam {
     public void setPersonType(int personType) {
         this.m_PersonType = personType;
     }
-    @DocAttribute(necessary = true,description = "任务是否完成",example = "已完成：7")
+    @DocAttribute(necessary = true,description = "任务是否完成",example = "7")
     public int getConditionState() {
         return m_ConditionState;
     }

@@ -3,11 +3,11 @@ package cn.haichang.assignment.impl;
 import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.AssignmentService;
 import cn.haichang.assignment.Lable;
+import cn.haichang.assignment.weforward.Bug;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
 import cn.weforward.data.persister.PersisterFactory;
-import cn.weforward.data.persister.ext.ConditionUtil;
 import cn.weforward.framework.ApiException;
 
 import java.util.ArrayList;
@@ -23,7 +23,6 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     public AssignmentServiceImpl(PersisterFactory factory) {
         super(factory);
     }
-
 
     @Override
     public Assignment createAssignment(String title, String content,
@@ -157,4 +156,36 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         }
         return false;
     }
+
+    /*------------------------------------------BUG相关-------------------------------------------------*/
+
+    public Bug createBug(String assignmentId,
+                         String bugContent,int severity,
+                         Set<String> tester,String versionAndPlatform){
+        return new BugImpl(this,assignmentId,bugContent,severity
+        ,tester,versionAndPlatform);
+    }
+
+    @Override
+    public ResultPage<Bug> getBugByAssignmentId(String fatherId) {
+        ResultPage<? extends Bug> rp = m_PsBug.startsWith(fatherId);
+        List<Bug> list = new ArrayList<>();
+        for (Bug bug : ResultPageHelper.toForeach(rp)) {
+            list.add(bug);
+        }
+        return ResultPageHelper.toResultPage(list);
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

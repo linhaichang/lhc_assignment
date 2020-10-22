@@ -20,12 +20,14 @@ public class AssignmentDiImpl implements AssignmentDi {
     protected PersisterFactory m_Factory;
     protected Persister<AssignmentImpl> m_PsAssignment;
     protected Persister<LableImpl> m_PsLable;
+    protected Persister<BugImpl> m_PsBug;
 
 
     public AssignmentDiImpl(PersisterFactory factory) {
         m_Factory = factory;
         m_PsAssignment = m_Factory.createPersister(AssignmentImpl.class, this);
         m_PsLable = m_Factory.createPersister(LableImpl.class, this);
+        m_PsBug = m_Factory.createPersister(BugImpl.class, this);
     }
     @Override
     public <E extends Persistent> Persister<E> getPersister(Class<E> clazz) {

@@ -49,7 +49,7 @@ public class AssignmentParam {
     public void setHandlers(List<String> m_Handlers) {
         this.m_Handlers = m_Handlers;
     }
-    @DocAttribute(necessary = true,description = "跟进人",example = "小思")
+    @DocAttribute(description = "跟进人",example = "小思")
     public String  getFollowers() {
         return m_Followers;
     }
@@ -96,12 +96,12 @@ public class AssignmentParam {
     public void setLevel(int level){
         this.m_Level = level;
     }
-    @DocAttribute(necessary = true,description = "任务状态",example = "0-9")
+   /* @DocAttribute(necessary = true,description = "任务状态",example = "0-9")
     public int getState() {
         return m_State;
     }
     public void setState(int state){
         m_State = state;
-    }
+    }*/
 
 }

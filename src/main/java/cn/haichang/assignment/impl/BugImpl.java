@@ -25,7 +25,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
     @Resource
     protected int m_Severity;
     @Resource
-    protected NameItem m_State;
+    protected int m_State;
     @Resource
     protected boolean m_IsSolved;
     @Resource
@@ -43,20 +43,19 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
     @Resource
     protected int m_IsDelete;
 
-
-
     protected BugImpl(AssignmentDi di) {
         super(di);
     }
-    protected BugImpl(AssignmentDi di,String AssignmentId,
+
+    public BugImpl(AssignmentDi di,String assignmentId,
                       String bugContent,int severity,
                       Set<String> tester,String versionAndPlatform) {
         super(di);
-        genPersistenceId(AssignmentId);
-        m_AssignmentId = AssignmentId;
+        genPersistenceId(assignmentId);
+        m_AssignmentId = assignmentId;
         m_BugContent = bugContent;
         m_Severity = severity;
-        m_State = STATE_WAIT_CORRECT;
+        m_State = STATE_WAIT_CORRECT.id;
         m_IsSolved = false;
         m_Testers = tester;
         m_TestHandlers = new HashSet<>();
@@ -126,13 +125,9 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
 
     @Override
     public NameItem getState() {
-        return m_State;
+        return STATES_BUGS.get(m_State);
     }
 
-   /* @Override
-    public void setStatus(int status) {
-
-    }*/
 
     @Override
     public boolean isSolved() {
@@ -150,7 +145,6 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         return m_Creator;
     }
 
-    /*状态扭转*/
     @Override
     public Date getCreateTime() {
         return m_CreateTime;
@@ -179,7 +173,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
             +STATE_ADVISE_DONT_EDIT.getName()+"、"+STATE_ASK_CANT_EDIT.getName()+
                     "的状态,不能扭转为"+STATE_WAIT_CORRECT.getName());
         }
-        m_State = STATE_WAIT_CORRECT;
+        m_State = STATE_WAIT_CORRECT.id;
         markPersistenceUpdate();
     }
 
@@ -194,7 +188,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     +STATE_REOPEN.getName()+
                     "的状态,不能扭转为"+STATE_WAIT_RETEST.getName());
         }
-        m_State = STATE_WAIT_RETEST;
+        m_State = STATE_WAIT_RETEST.id;
         markPersistenceUpdate();
     }
 
@@ -208,7 +202,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
             throw new ApiException(0, "非"+STATE_WAIT_CORRECT.getName()+
                     "的状态,不能扭转为"+STATE_ADVISE_DONT_EDIT.getName());
         }
-        m_State = STATE_ADVISE_DONT_EDIT;
+        m_State = STATE_ADVISE_DONT_EDIT.id;
         markPersistenceUpdate();
     }
 
@@ -222,7 +216,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
             throw new ApiException(0, "非"+STATE_WAIT_CORRECT.getName()+
                     "的状态,不能扭转为"+STATE_ASK_CANT_EDIT.getName());
         }
-        m_State = STATE_ASK_CANT_EDIT;
+        m_State = STATE_ASK_CANT_EDIT.id;
         markPersistenceUpdate();
     }
 
@@ -236,7 +230,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
             throw new ApiException(0, "非"+STATE_WAIT_RETEST.getName()+
                     "的状态,不能扭转为"+STATE_SOLVED.getName());
         }
-        m_State = STATE_SOLVED;
+        m_State = STATE_SOLVED.id;
         markPersistenceUpdate();
     }
 
@@ -250,7 +244,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
             throw new ApiException(0, "非"+STATE_ADVISE_DONT_EDIT.getName()+
                     "的状态,不能扭转为"+STATE_NO_EDIT.getName());
         }
-        m_State = STATE_NO_EDIT;
+        m_State = STATE_NO_EDIT.id;
         markPersistenceUpdate();
     }
 
@@ -264,7 +258,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
             throw new ApiException(0, "非"+STATE_ASK_CANT_EDIT.getName()+
                     "的状态,不能扭转为"+STATE_CANT_SOLVE.getName());
         }
-        m_State = STATE_CANT_SOLVE;
+        m_State = STATE_CANT_SOLVE.id;
         markPersistenceUpdate();
     }
 
@@ -280,7 +274,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     STATE_NO_EDIT.getName()+"、"+STATE_CANT_SOLVE.getName()+
                     "的状态,不能扭转为"+STATE_REOPEN.getName());
         }
-        m_State = STATE_REOPEN;
+        m_State = STATE_REOPEN.id;
         markPersistenceUpdate();
     }
 
