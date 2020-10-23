@@ -34,8 +34,9 @@ public interface AssignmentService {
     Lable createLable(String lableName);
     Lable getLable(String lableId);
     ResultPage<Lable> getAllLables();
+
+    ResultPage<Assignment> getByKeyWord(String keywords);
     boolean deleteLable(String lableId);
-//    ResultPage<AssignmentImpl> getAssignmentsByLableId(String lableId);
     ResultPage<Assignment> getAllAssignments();
 
     Bug createBug(String assignmentId,
@@ -43,5 +44,6 @@ public interface AssignmentService {
                   Set<String> tester, String versionAndPlatform);
 
     ResultPage<Bug> getBugByAssignmentId(String AssignmentId);
-
+    Bug getBug(String id);
+    ResultPage<Bug> getBugByKeyWord(String keywords);
 }

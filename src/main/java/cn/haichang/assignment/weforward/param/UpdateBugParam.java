@@ -1,7 +1,6 @@
 package cn.haichang.assignment.weforward.param;
 
 import cn.weforward.protocol.doc.annotation.DocAttribute;
-import cn.weforward.protocol.doc.annotation.DocObject;
 
 import java.util.List;
 
@@ -9,22 +8,25 @@ import java.util.List;
  * @author HaiChang
  * @date 2020/10/22
  **/
-@DocObject(description = "Bug参数")
-public class BugParam {
-    protected String m_AssignmentId;
-
+public class UpdateBugParam{
     protected String m_BugContent;
     protected int m_Severity;
     protected List<String > m_Testers;
-    protected String m_VersionAndPlatform;
-    protected List<String > m_TestHandlers;
+    protected List<String > m_Handlers;
+    protected String m_Id;
 
-    @DocAttribute(necessary = true, description = "需求Id", example = "输入需求的id")
-    public String getAssignmentId() {
-        return m_AssignmentId;
+    @DocAttribute(necessary = true,description = "BugId",example = "123")
+    public String getId(){
+        return m_Id;
     }
-    public void setAssignmentId(String AssignmentId) {
-        this.m_AssignmentId = AssignmentId;
+    public void setId(String id){
+        m_Id = id;
+    }
+
+    @DocAttribute(necessary = true,description = "处理人员",example = "21")
+    public List<String > getHandlers(){return m_Handlers;}
+    public void setHandlers(List<String > handlers){
+        this.m_Handlers = handlers;
     }
 
     @DocAttribute(necessary = true, description = "Bug内容", example = "我是Bug内容")
@@ -43,22 +45,12 @@ public class BugParam {
         this.m_Severity = Severity;
     }
 
-    @DocAttribute(description = "测试人员", example = "\"小马\",\"小云\"")
+    @DocAttribute(necessary = true, description = "测试人员", example = "\"小马\",\"小云\"")
     public List<String> getTesters() {
         return m_Testers;
     }
     public void setTesters(List<String> Testers) {
         this.m_Testers = Testers;
     }
-
-    @DocAttribute(necessary = true, description = "版本与平台", example = "商家后台")
-    public String getVersionAndPlatform() {
-        return m_VersionAndPlatform;
-    }
-    public void setVersionAndPlatform(String VersionAndPlatform) {
-        this.m_VersionAndPlatform = VersionAndPlatform;
-    }
-
-
 
 }

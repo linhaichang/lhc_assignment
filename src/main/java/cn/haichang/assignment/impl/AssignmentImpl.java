@@ -1,22 +1,22 @@
 package cn.haichang.assignment.impl;
 
 import cn.haichang.assignment.Assignment;
-import cn.haichang.assignment.Lable;
 import cn.haichang.assignment.di.AssignmentDi;
 import cn.weforward.common.NameItem;
+import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;
 import cn.weforward.data.UniteId;
 import cn.weforward.data.annotation.Index;
+import cn.weforward.data.log.BusinessLog;
 import cn.weforward.data.persister.support.AbstractPersistent;
 import cn.weforward.framework.ApiException;
 import cn.weforward.framework.support.Global;
-import cn.weforward.framework.util.ValidateUtil;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
 
 /**
+ * 任务实现类
  * @author HaiChang
  * @date 2020/10/16
  **/
@@ -34,7 +34,6 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     protected Set<String> m_Followers;
     @Resource
     protected String m_Charger;
-    /*索引处*/
     @Index
     @Resource
     protected String m_LableId;
@@ -54,23 +53,21 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     protected String m_FatherID;
     @Resource
     protected int m_IsDelete;
-    /*保存状态扭转的规则*/
-//    private static HashMap<Integer,List> hashMap = new HashMap<>();
-//    private static final SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+
 
     protected AssignmentImpl(AssignmentDi di) {
         super(di);
     }
 
     public AssignmentImpl(AssignmentDi di,String title,String content,
-                          /*String creator,*/Set<String> handlers,
+                          Set<String> handlers,
                           String charger,String lableId,Date startTime,
                           Date endTime,int level){
         super(di);
         genPersistenceId();
         m_Title=title;
         m_Content=content;
-        m_Creator= Global.TLS.getValue("creator");
+        m_Creator= getCreator();
         m_Handlers=handlers;
         m_Charger=charger;
         m_Followers=new HashSet<>();
@@ -82,6 +79,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_CreateTime=new Date();
         m_FatherID=null;
         m_IsDelete = 0;
+        getBusinessDi().writeLog(getId(), m_Creator,"创建", "新任务", "");
         markPersistenceUpdate();
     }
 
@@ -110,6 +108,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_CreateTime=new Date();
         m_FatherID = fatherId;
         m_IsDelete = 0;
+        getBusinessDi().writeLog(getId(), m_Creator,"创建", "新子任务", "");
         markPersistenceUpdate();
     }
 
@@ -124,6 +123,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         m_Title=title;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改", "标题为"+title, "");
         markPersistenceUpdate();
     }
 
@@ -133,72 +133,86 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         m_Title=content;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改内容", "", "");
         markPersistenceUpdate();
     }
 
     @Override
     public void addHandler(Set<String> handlers) {
-        if (null == handlers){
+        if (0 == handlers.size()){
             return;
         }
+        String oldHandlers = m_Handlers.toString();
         for (String handler : handlers) {
             m_Handlers.add(handler);
         }
+        String newHandlers = m_Handlers.toString();
+        getBusinessDi().writeLog(getId(), m_Creator,"修改处理人", "原处理人"+oldHandlers
+                +"修改为"+newHandlers, "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void removeHandler(Set<String> handlers) {
-        if (null == handlers){
+    public void removeHandler(String handler) {
+        if (!m_Handlers.contains(handler)){
             return;
         }
-        for (String handler : handlers) {
-            m_Handlers.remove(handler);
-        }
+        m_Handlers.remove(handler);
+        getBusinessDi().writeLog(getId(), m_Creator,"移除处理人", handler, "");
         markPersistenceUpdate();
     }
 
     @Override
     public void addFollower(String follower) {
-        System.out.println(follower);
-        if (null ==follower){
+        if (m_Followers.contains(follower)){
             return;
         }
         m_Followers.add(follower);
+        getBusinessDi().writeLog(getId(), m_Creator,"跟进仍无", follower, "");
         markPersistenceUpdate();
     }
 
 
     @Override
     public void setCharger(String charger) {
+        String oldCharger = m_Charger;
+        if(StringUtil.eq(charger, m_Charger)){
+            return;
+        }
         m_Charger=charger;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改负责人", "原负责人"+oldCharger
+                +"修改为"+charger, "");
         markPersistenceUpdate();
     }
 
     @Override
     public void setLableId(String lableId) {
-        if (m_LableId == lableId){
+        if(StringUtil.eq(lableId, m_LableId)){
             return;
         }
         m_LableId=lableId;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改标签", "","");
         markPersistenceUpdate();
     }
 
     @Override
     public void setStartTime(Date startTime) {
-        if (m_StartTime == startTime){
+        if (m_StartTime.toString() == startTime.toString()){
             return;
         }
         m_StartTime=startTime;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改开始时间为", startTime.toString(),"");
         markPersistenceUpdate();
     }
 
     @Override
     public void setEndTime(Date endTime) {
-        if (m_EndTime == endTime){
+        if (m_EndTime.toString() == endTime.toString()){
             return;
         }
         m_EndTime=endTime;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改结束时间为", endTime.toString(),"");
+
         markPersistenceUpdate();
     }
 
@@ -272,43 +286,6 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         return m_FatherID;
     }
 
-//    static {
-//        /*评估中 0 ：-》规划中，已拒绝，*/
-//        hashMap.put(STATE_ESTIMATE.id, Arrays.asList(STATE_PLAN.id,STATE_REJECT.id));
-//        /*规划中 1 ：-》待开发，已拒绝，挂起*/
-//        hashMap.put(STATE_PLAN.id, Arrays.asList(STATE_WAIT_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-//        /*待开发 2：-》开发中，已拒绝，挂起*/
-//        hashMap.put(STATE_WAIT_DEVELOP.id, Arrays.asList(STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-//        /*开发中 3：-》待测试，已拒绝，挂起*/
-//        hashMap.put(STATE_DEVELOP.id, Arrays.asList(STATE_WAIT_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
-//        /*待测试 4：-》开发中，测试中，已拒绝，挂起*/
-//        hashMap.put(STATE_WAIT_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_TEST,STATE_REJECT.id,STATE_PENDING.id));
-//        /*测试中 5：-》开发中，测试通过，已拒绝，挂起*/
-//        hashMap.put(STATE_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_PASS_TEST.id,STATE_REJECT.id,STATE_PENDING.id));
-//        /*测试通过 6：-》开发中，已上线，已拒绝，挂起，*/
-//        hashMap.put(STATE_PASS_TEST.id, Arrays.asList(STATE_DEVELOP.id,STATE_DEVELOP.id,STATE_REJECT.id,STATE_PENDING.id));
-//        /*以上线 7：-》无 */
-//        hashMap.put(STATE_ONLINE.id, Arrays.asList());
-//        /*已拒绝 8：-》无 */
-//        hashMap.put(STATE_REJECT.id, Arrays.asList());
-//        /*挂起 9：-》评估中，待开发，待测试，测试通过，已拒绝，*/
-//        hashMap.put(STATE_PENDING.id, Arrays.asList(STATE_ESTIMATE.id,STATE_DEVELOP.id,STATE_WAIT_TEST.id,STATE_PASS_TEST.id,STATE_REJECT.id));
-//    }
-//    @Override
-//    public void changeState(int stateId) throws ApiException {
-//        List list = hashMap.get(getState().id);
-//        if (list.contains(stateId)) {
-//            m_State = stateId;
-//            if (stateId == 7 || stateId == 8){
-//                m_FinishTime = new Date();
-//            }
-//        }
-//        else {
-//            throw new ApiException(202, "状态扭转错误");
-//        }
-//        markPersistenceUpdate();
-//    }
-
 
     @Override
     public void LevelHighest() {
@@ -360,6 +337,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             +"的状态，不能扭转为"+STATE_ESTIMATE.getName());
         }
         m_State = STATE_ESTIMATE.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_ESTIMATE.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -374,6 +352,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_PLAN.getName());
         }
         m_State = STATE_PLAN.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_PLAN.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -389,6 +368,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_WAIT_DEVELOP.getName());
         }
         m_State = STATE_WAIT_DEVELOP.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_WAIT_DEVELOP.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -406,6 +386,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_DEVELOP.getName());
         }
         m_State = STATE_DEVELOP.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_DEVELOP.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -421,6 +402,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_WAIT_TEST.getName());
         }
         m_State = STATE_WAIT_TEST.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_WAIT_TEST.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -435,6 +417,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_TEST.getName());
         }
         m_State = STATE_TEST.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_TEST.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -450,6 +433,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_PASS_TEST.getName());
         }
         m_State = STATE_PASS_TEST.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_PASS_TEST.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -464,6 +448,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_ONLINE.getName());
         }
         m_State = STATE_ONLINE.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_ONLINE.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -486,6 +471,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_REJECT.getName());
         }
         m_State = STATE_REJECT.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_REJECT.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -506,7 +492,46 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_PENDING.getName());
         }
         m_State = STATE_PENDING.id;
+        getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_PENDING.getName(), "");
         markPersistenceUpdate();
+    }
+
+    private String getUser() {
+        String user = Global.TLS.getValue("creator");
+        if (null == user) {
+            user = "creator";
+        }
+        return user;
+    }
+
+
+    public int getBugsCount(){
+        return getBusinessDi().getBugsCount(getId().getOrdinal());
+    }
+    public int getBugsFinishCount(){
+        return getBusinessDi().getBugsFinishCount(getId().getOrdinal());
+    }
+
+    @Override
+    public Map<String, Integer> getStateAnalysis() {
+        return getBusinessDi().getStateAnalysis(getId().getOrdinal());
+    }
+
+
+
+    @Override
+    public Map<String, Integer> getTesterAndCount() {
+        return getBusinessDi().getTesterAndCount(getId().getOrdinal());
+    }
+
+    @Override
+    public Map<String, Integer> getHandlerAndCount() {
+        return getBusinessDi().getHandlerAndCount(getId().getOrdinal());
+    }
+
+    @Override
+    public ResultPage<BusinessLog> getLogs() {
+        return getBusinessDi().getLogs(getId());
     }
 
 }

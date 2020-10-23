@@ -7,6 +7,7 @@ import cn.haichang.assignment.weforward.Bug;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
+import cn.weforward.data.log.BusinessLoggerFactory;
 import cn.weforward.data.persister.PersisterFactory;
 import cn.weforward.framework.ApiException;
 
@@ -20,8 +21,8 @@ import java.util.Set;
  * @date 2020/10/19
  **/
 public class AssignmentServiceImpl extends AssignmentDiImpl implements AssignmentService {
-    public AssignmentServiceImpl(PersisterFactory factory) {
-        super(factory);
+    public AssignmentServiceImpl(PersisterFactory factory, BusinessLoggerFactory loggerFactory) {
+        super(factory, loggerFactory);
     }
 
     @Override
@@ -29,7 +30,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
                                        String creator, Set<String> handlers,
                                        String charger, String lableId, Date startTime,
                                        Date endTime, int level) {
-        return new AssignmentImpl(this, title, content/*, creator*/, handlers, charger, lableId, startTime, endTime, level);
+        return new AssignmentImpl(this, title, content, handlers, charger, lableId, startTime, endTime, level);
     }
 
     @Override
@@ -104,6 +105,17 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     }
 
     @Override
+    public ResultPage<Assignment> getByKeyWord(String keyword) {
+        ResultPage<? extends Assignment> rp = m_PsAssignment.startsWith("");
+        List<Assignment> list = new ArrayList<>();
+        for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
+            if (assignment.getTitle().contains(keyword) && !assignment.isDelete())
+            list.add(assignment);
+        }
+        return ResultPageHelper.toResultPage(list);
+    }
+
+    @Override
     public boolean deleteLable(String lableId) {
         return m_PsLable.remove(lableId);
     }
@@ -172,6 +184,22 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         List<Bug> list = new ArrayList<>();
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
             list.add(bug);
+        }
+        return ResultPageHelper.toResultPage(list);
+    }
+
+    @Override
+    public Bug getBug(String id) {
+        return m_PsBug.get(id);
+    }
+
+    @Override
+    public ResultPage<Bug> getBugByKeyWord(String keywords) {
+        ResultPage<? extends Bug> rp = m_PsBug.startsWith("");
+        List<Bug> list = new ArrayList<>();
+        for (Bug bug : ResultPageHelper.toForeach(rp)) {
+            if (bug.getBugContent().contains(keywords))
+                list.add(bug);
         }
         return ResultPageHelper.toResultPage(list);
     }

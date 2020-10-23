@@ -56,6 +56,5 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
         ResultPage<AssignmentImpl> assignments = getBusinessDi().searchAssignmentByLableId(getId().getOrdinal());
         return assignments;
     }
-
 }
 

@@ -32,11 +32,12 @@
 		<constructor-arg index="0" value="${mongodb.url}"/>
 		<property name="serverId" value="${weforward.serverid}"/>
 	</bean>
-	<!--日志记录-->
-	<!--<bean id="productLoggerFactory" class="cn.weforward.data.log.label.LabelBusinessLoggerFactory">
+
+	<!-- 日志文件 -->
+	<bean id="productLoggerFactory" class="cn.weforward.data.log.label.LabelBusinessLoggerFactory">
 		<constructor-arg index="0" ref="productLabelSetFactory"/>
 		<constructor-arg index="1" value="${weforward.serverid}"/>
-	</bean>-->
+	</bean>
 	
 	<!-- 计数器 -->
 	<bean id="productCounterFactory" class="cn.weforward.data.counter.label.LabelCounterFactory">

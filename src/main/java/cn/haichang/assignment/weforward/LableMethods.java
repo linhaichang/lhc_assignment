@@ -67,7 +67,6 @@ public class LableMethods {
          * 判断此标签的任务数是否=0
          */
         int i =lable.getAssignments().getCount();
-        System.out.println(i);
         if (lable.getAssignments().getCount() == 0 ){
             m_AssignmentService.deleteLable(params.getString("LableId"));
         }else {
@@ -87,8 +86,6 @@ public class LableMethods {
     @WeforwardMethod
     @DocMethod(description = "修改标签名", index = 3)
     public String update(UpdateLableParam params){
-        System.out.println(params.getLableId());
-        System.out.println(params.getLableName());
         Lable lable = m_AssignmentService.getLable(params.getLableId());
         if (null == lable){
             return "无此标签";

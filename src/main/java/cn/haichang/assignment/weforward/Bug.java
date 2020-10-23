@@ -2,7 +2,9 @@ package cn.haichang.assignment.weforward;
 
 import cn.weforward.common.NameItem;
 import cn.weforward.common.NameItems;
+import cn.weforward.common.ResultPage;
 import cn.weforward.data.UniteId;
+import cn.weforward.data.log.BusinessLog;
 import cn.weforward.framework.ApiException;
 
 import java.util.Date;
@@ -13,7 +15,7 @@ import java.util.Set;
  * @date 2020/10/22
  **/
 public interface Bug {
-    NameItem STATE_WAIT_CORRECT = NameItem.valueOf("待修复", 20);
+    NameItem STATE_WAIT_CORRECT = NameItem.valueOf("待修正", 20);
     NameItem STATE_WAIT_RETEST = NameItem.valueOf("待复测",21 );
     NameItem STATE_ADVISE_DONT_EDIT = NameItem.valueOf("建议不做修改", 22);
     NameItem STATE_ASK_CANT_EDIT =NameItem.valueOf("申请无法修改",23);
@@ -50,15 +52,12 @@ public interface Bug {
     void addTestHandler(Set<String> testHanders);
 
     NameItem getState();
-    /*void setState(int status);*/
 
-    boolean isSolved();
-    void setSolved(boolean solved);
+//    boolean isSolved();
+//    void setSolved(boolean solved);
 
     String getCreator();
-    /*void setCreator(String creator);*/
 
-//    void changeState(int state);
     /*创建时间*/
     Date getCreateTime();
 
@@ -75,5 +74,7 @@ public interface Bug {
     void turnReopen()throws ApiException;
 
     void deleteBug()throws ApiException;
+
+    public ResultPage<BusinessLog> getLogs();
 
 }

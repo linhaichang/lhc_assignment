@@ -2,12 +2,15 @@ package cn.haichang.assignment;
 
 import cn.weforward.common.NameItem;
 import cn.weforward.common.NameItems;
+import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;
 import cn.weforward.data.UniteId;
+import cn.weforward.data.log.BusinessLog;
 import cn.weforward.framework.ApiException;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -64,7 +67,7 @@ public interface Assignment {
     void setContent(String content);
 
     void addHandler(Set<String> handlers);
-    void removeHandler(Set<String> handlers);
+    void removeHandler(String handler);
     void addFollower(String follower);
     void setCharger(String charger);
 
@@ -92,7 +95,6 @@ public interface Assignment {
 
     String getFatherId();
 
-//    void changeState(int stateId) throws ApiException;
 
     void LevelHighest();
     void LevelHigh();
@@ -112,5 +114,15 @@ public interface Assignment {
     void turnOnLine() throws ApiException;
     void turnReject() throws ApiException;
     void turnPending() throws ApiException;
+
+    int getBugsCount();
+    int getBugsFinishCount();
+
+    Map<String, Integer> getStateAnalysis();
+
+    Map<String ,Integer> getTesterAndCount();
+    Map<String ,Integer> getHandlerAndCount();
+    
+    ResultPage<BusinessLog> getLogs();
 
 }

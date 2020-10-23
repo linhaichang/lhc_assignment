@@ -3,7 +3,10 @@ package cn.haichang.assignment.impl;
 import cn.haichang.assignment.di.AssignmentDi;
 import cn.haichang.assignment.weforward.Bug;
 import cn.weforward.common.NameItem;
+import cn.weforward.common.ResultPage;
+import cn.weforward.common.util.StringUtil;
 import cn.weforward.data.UniteId;
+import cn.weforward.data.log.BusinessLog;
 import cn.weforward.data.persister.support.AbstractPersistent;
 import cn.weforward.framework.ApiException;
 import cn.weforward.framework.support.Global;
@@ -59,11 +62,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         m_IsSolved = false;
         m_Testers = tester;
         m_TestHandlers = new HashSet<>();
-        m_Creator = Global.TLS.getValue("creator");
+        m_Creator = getCreator();
         m_VersionAndPlatform = versionAndPlatform;
         m_CreateTime = new Date();
         m_LastTime = new Date();
         m_IsDelete = 0;
+        getBusinessDi().writeLog(getId(), m_Creator,"创建", "新BUG", "");
         markPersistenceUpdate();
     }
 
@@ -84,7 +88,11 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
 
     @Override
     public void setBugContent(String content) {
+        if (StringUtil.eq(m_BugContent, content)){
+            return;
+        }
         m_BugContent = content;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改内容", "", "");
         markPersistenceUpdate();
     }
 
@@ -95,7 +103,13 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
 
     @Override
     public void setSeverity(int severity) {
+        int oldSeverity = m_Severity;
+        if (m_Severity == severity){
+            return;
+        }
         m_Severity = severity;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改严重性", "从"+STATES_BUGS.get(oldSeverity).getName()
+                +"修改为"+STATES_BUGS.get(severity).getName(), "");
         markPersistenceUpdate();
     }
 
@@ -106,7 +120,13 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
 
     @Override
     public void setTesters(Set<String> testers) {
+        Set<String> oldTesters = m_Testers;
+        if (0 == testers.size()){
+            return;
+        }
         m_Testers = testers;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改测试人员", "从"+oldTesters.toString()
+                +"修改为"+testers.toString(), "");
         markPersistenceUpdate();
     }
 
@@ -117,9 +137,13 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
 
     @Override
     public void addTestHandler(Set<String> testHandlers) {
+        if (0 == testHandlers.size()){
+            return;
+        }
         for (String testHandler : testHandlers) {
             m_TestHandlers.add(testHandler);
         }
+        getBusinessDi().writeLog(getId(), m_Creator,"增加处理人员", "增加了"+testHandlers.toString(), "");
         markPersistenceUpdate();
     }
 
@@ -129,16 +153,16 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
     }
 
 
-    @Override
-    public boolean isSolved() {
-        return m_IsSolved;
-    }
-
-    @Override
-    public void setSolved(boolean solved) {
-        m_IsSolved = solved;
-        markPersistenceUpdate();
-    }
+//    @Override
+//    public boolean isSolved() {
+//        return m_IsSolved;
+//    }
+//
+//    @Override
+//    public void setSolved(boolean solved) {
+//        m_IsSolved = solved;
+//        markPersistenceUpdate();
+//    }
 
     @Override
     public String getCreator() {
@@ -162,7 +186,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
     }
 
     @Override
-    public void turnWaitingCorrcet() throws ApiException {
+    public synchronized void turnWaitingCorrcet() throws ApiException {
         NameItem state = getState();
         if (STATE_WAIT_CORRECT.id == state.id){
             return;
@@ -174,11 +198,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_WAIT_CORRECT.getName());
         }
         m_State = STATE_WAIT_CORRECT.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_WAIT_CORRECT.getName(), "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void turnWaitingRetest() throws ApiException {
+    public synchronized void turnWaitingRetest() throws ApiException {
         NameItem state = getState();
         if (STATE_WAIT_RETEST.id == state.id){
             return;
@@ -189,11 +214,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_WAIT_RETEST.getName());
         }
         m_State = STATE_WAIT_RETEST.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_WAIT_RETEST.getName(), "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void turnAdviseDontEdit() throws ApiException {
+    public synchronized void turnAdviseDontEdit() throws ApiException {
         NameItem state = getState();
         if (STATE_ADVISE_DONT_EDIT.id == state.id){
             return;
@@ -203,11 +229,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_ADVISE_DONT_EDIT.getName());
         }
         m_State = STATE_ADVISE_DONT_EDIT.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_ADVISE_DONT_EDIT.getName(), "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void turnAskingCantEdit() throws ApiException {
+    public synchronized void turnAskingCantEdit() throws ApiException {
         NameItem state = getState();
         if (STATE_ASK_CANT_EDIT.id == state.id){
             return;
@@ -217,11 +244,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_ASK_CANT_EDIT.getName());
         }
         m_State = STATE_ASK_CANT_EDIT.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_ASK_CANT_EDIT.getName(), "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void turnSolved() throws ApiException {
+    public synchronized void turnSolved() throws ApiException {
         NameItem state = getState();
         if (STATE_SOLVED.id == state.id){
             return;
@@ -231,11 +259,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_SOLVED.getName());
         }
         m_State = STATE_SOLVED.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_SOLVED.getName(), "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void turnNoEdit() throws ApiException {
+    public synchronized void turnNoEdit() throws ApiException {
         NameItem state = getState();
         if (STATE_NO_EDIT.id == state.id){
             return;
@@ -245,11 +274,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_NO_EDIT.getName());
         }
         m_State = STATE_NO_EDIT.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_NO_EDIT.getName(), "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void turnCantSolved() throws ApiException {
+    public synchronized void turnCantSolved() throws ApiException {
         NameItem state = getState();
         if (STATE_CANT_SOLVE.id == state.id){
             return;
@@ -259,11 +289,12 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_CANT_SOLVE.getName());
         }
         m_State = STATE_CANT_SOLVE.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_CANT_SOLVE.getName(), "");
         markPersistenceUpdate();
     }
 
     @Override
-    public void turnReopen() throws ApiException {
+    public synchronized void turnReopen() throws ApiException {
         NameItem state = getState();
         if (STATE_REOPEN.id == state.id){
             return;
@@ -275,6 +306,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
                     "的状态,不能扭转为"+STATE_REOPEN.getName());
         }
         m_State = STATE_REOPEN.id;
+        getBusinessDi().writeLog(getId(), getUser(),"bug状态扭转", "状态从"+STATES_BUGS.get(this.m_State).getName()+"扭转为"+STATE_REOPEN.getName(), "");
         markPersistenceUpdate();
     }
 
@@ -282,4 +314,18 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
     public void deleteBug() {
         m_IsDelete = STATE_DELETE.id;
     }
+
+    private String getUser() {
+        String user = Global.TLS.getValue("creator");
+        if (null == user) {
+            user = "creator";
+        }
+        return user;
+    }
+
+    @Override
+    public ResultPage<BusinessLog> getLogs() {
+        return getBusinessDi().getLogs(getId());
+    }
+
 }
