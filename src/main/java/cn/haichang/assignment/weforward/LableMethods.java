@@ -50,8 +50,10 @@ public class LableMethods {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "LableId", type = String.class, necessary = true, description = "标签id"))
     @DocMethod(description = "获取标签", index = 1)
-    public LableView get(FriendlyObject params){
-        return LableView.valueOf(m_AssignmentService.getLable(params.getString("LableId")));
+    public LableView get(FriendlyObject params) throws ApiException {
+        String lableId = params.getString("LableId");
+        ValidateUtil.isEmpty(lableId,"标签Id不能为空");
+        return LableView.valueOf(m_AssignmentService.getLable(lableId));
     }
 
     @KeepServiceOrigin
@@ -59,8 +61,10 @@ public class LableMethods {
     @DocParameter(@DocAttribute(name = "LableId", type = String.class,necessary = true, description = "标签Id"))
     @DocMethod(description = "删除标签", index = 4)
     public String delete(FriendlyObject params) throws ApiException {
-        if (null == m_AssignmentService.getLable(params.getString("LableId"))){
-            throw new ApiException(999,"无此标签");
+        String lableId = params.getString("LableId");
+        ValidateUtil.isEmpty(lableId,"标签Id不能为空");
+        if (null == m_AssignmentService.getLable(lableId)){
+            throw new ApiException(0,"无此标签");
         }
         Lable lable = m_AssignmentService.getLable(params.getString("LableId"));
         /**
@@ -78,19 +82,23 @@ public class LableMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocMethod(description = "获取所有标签", index = 2)
-    public ResultPage<Lable> getAll(/*FriendlyObject params*/){
+    public ResultPage<Lable> getAll(){
         return m_AssignmentService.getAllLables();
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
     @DocMethod(description = "修改标签名", index = 3)
-    public String update(UpdateLableParam params){
-        Lable lable = m_AssignmentService.getLable(params.getLableId());
+    public String update(UpdateLableParam params) throws ApiException {
+        String lableId = params.getLableId();
+        String lableName = params.getLableName();
+        ValidateUtil.isEmpty(lableId, "标签id不能为空");
+        ValidateUtil.isEmpty(lableName, "标签名不能为空");
+        Lable lable = m_AssignmentService.getLable(lableId);
         if (null == lable){
             return "无此标签";
         }
-        lable.setLableName(params.getLableName());
+        lable.setLableName(lableName);
         return "成功修改标签";
     }
 }

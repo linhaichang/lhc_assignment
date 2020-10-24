@@ -50,25 +50,17 @@ public class AssignmentDiImpl implements AssignmentDi {
     @Override
     public ResultPage<AssignmentImpl> searchAssignmentByLableId(String lableId) {
         ResultPage<AssignmentImpl> assignments = m_PsAssignment.search(
-                ConditionUtil.eq(ConditionUtil.field("lableId"), lableId));
+                ConditionUtil.eq(ConditionUtil.field("lableId"), lableId)
+        );
         return assignments;
     }
 
-    /**
-     * 计算该任务的Bug数量
-     * @param AssignmentId
-     * @return
-     */
+
     @Override
     public int getBugsCount(String AssignmentId) {
         return m_PsBug.startsWith(AssignmentId).getCount();
     }
 
-    /**
-     * 计算该任务已完成的Bug数量
-     * @param assignmentId
-     * @return
-     */
     @Override
     public int getBugsFinishCount(String assignmentId) {
         ResultPage<BugImpl> rp = m_PsBug.startsWith(assignmentId);
@@ -83,38 +75,21 @@ public class AssignmentDiImpl implements AssignmentDi {
         return allCount;
     }
 
-    /**
-     * 统计任务的Bug状态
-     * @param assignmentId
-     * @return
-     */
     @Override
     public Map<String, Integer> getStateAnalysis(String assignmentId) {
         ResultPage<BugImpl> rp = m_PsBug.startsWith(assignmentId);
-        Map<String ,Integer> map = new ConcurrentHashMap<>();
-        /*首先将常量加入map*/
-        for (int j = 0; j < Bug.STATES_BUGS.size(); j++) {
-            map.put(Bug.STATES_BUGS.get(j+20).getName(), 0);
-        }
+        Map<String ,Integer> map = new HashMap<>(Bug.STATES_BUGS.size());
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
             NameItem nameItem = Bug.STATES_BUGS.get(bug.getState().id);
-            Integer integer = map.get(nameItem.getName());
-            map.put(nameItem.name, ++integer);
-        }
-        for (String key : map.keySet()) {
-            if (0 == map.get(key)){
-                map.remove(key);
-            }
+            String stateName = nameItem.name;
+            Integer count = null == map.get(stateName) ? 0 : map.get(stateName);
+            map.put(stateName,++count);
         }
         return map;
     }
 
 
-    /**
-     * 计算此任务中测试人员找出Bug的数量
-     * @param AssignmentId
-     * @return
-     */
+
     @Override
     public Map<String, Integer> getTesterAndCount(String AssignmentId) {
         ArrayList<String > list = new ArrayList<>();
@@ -129,11 +104,7 @@ public class AssignmentDiImpl implements AssignmentDi {
         return statistics(testArr);
     }
 
-    /**
-     * 计算此任务中处理人员处理Bug的数量
-     * @param AssignmentId
-     * @return
-     */
+
     @Override
     public Map<String, Integer> getHandlerAndCount(String AssignmentId) {
         ArrayList<String > list = new ArrayList<>();
@@ -166,7 +137,7 @@ public class AssignmentDiImpl implements AssignmentDi {
     /**
      * 统计字符串数组中元素的出现次数
      * @param arr
-     * @return
+     * @return 统计结果
      */
     private static Map<String,Integer> statistics(String[] arr){
         HashMap<String , Integer> map = new HashMap<>();

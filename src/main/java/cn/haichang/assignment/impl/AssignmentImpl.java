@@ -153,9 +153,9 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     @Override
-    public void removeHandler(String handler) {
+    public void removeHandler(String handler) throws ApiException {
         if (!m_Handlers.contains(handler)){
-            return;
+            throw new ApiException(0,"没有此人");
         }
         m_Handlers.remove(handler);
         getBusinessDi().writeLog(getId(), m_Creator,"移除处理人", handler, "");
@@ -168,7 +168,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         m_Followers.add(follower);
-        getBusinessDi().writeLog(getId(), m_Creator,"跟进仍无", follower, "");
+        getBusinessDi().writeLog(getId(), m_Creator,"跟进任务", follower, "");
         markPersistenceUpdate();
     }
 
@@ -496,14 +496,6 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
-    private String getUser() {
-        String user = Global.TLS.getValue("creator");
-        if (null == user) {
-            user = "creator";
-        }
-        return user;
-    }
-
 
     public int getBugsCount(){
         return getBusinessDi().getBugsCount(getId().getOrdinal());
@@ -532,6 +524,14 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     @Override
     public ResultPage<BusinessLog> getLogs() {
         return getBusinessDi().getLogs(getId());
+    }
+
+    private String getUser() {
+        String creator = Global.TLS.getValue("creator");
+        if (null == creator) {
+            creator = "creator";
+        }
+        return creator;
     }
 
 }

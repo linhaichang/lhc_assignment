@@ -16,5 +16,9 @@ public interface Lable {
     void setLableName(String lableName);
     String getLableName();
 
+    /**
+     * 获取标签下的所有任务
+     * @return
+     */
     ResultPage<AssignmentImpl> getAssignments();
 }

@@ -36,7 +36,13 @@ public interface Bug {
 
     NameItem STATE_DELETE = NameItem.valueOf("删除", 28);
 
+    /**
+     * 获取ID
+     * @return
+     */
     UniteId getId();
+
+
     String getAssignmentId();
 
     String getBugContent();
@@ -49,22 +55,17 @@ public interface Bug {
     void setTesters(Set<String> tester);
 
     Set<String> getTestHandlers();
-    void addTestHandler(Set<String> testHanders);
+    void addTestHandler(Set<String> testHandlers);
 
     NameItem getState();
 
-//    boolean isSolved();
-//    void setSolved(boolean solved);
-
     String getCreator();
 
-    /*创建时间*/
-    Date getCreateTime();
 
     void setLastTime(Date lastTime);
     Date getLastTime();
-
-    void turnWaitingCorrcet() throws ApiException;
+    /*状态扭转*/
+    void turnWaitingCorrect() throws ApiException;
     void turnWaitingRetest() throws ApiException;
     void turnAdviseDontEdit()throws ApiException;
     void turnAskingCantEdit()throws ApiException;
@@ -75,6 +76,6 @@ public interface Bug {
 
     void deleteBug()throws ApiException;
 
-    public ResultPage<BusinessLog> getLogs();
+    ResultPage<BusinessLog> getLogs();
 
 }

@@ -78,7 +78,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     @Override
     public void deleteaAssignment(String id) throws ApiException {
         if (null == m_PsAssignment.get(id)){
-            throw new ApiException(999, "无此任务");
+            throw new ApiException(0, "无此任务");
         }
         AssignmentImpl assignment = m_PsAssignment.get(id);
         assignment.delete();
@@ -143,13 +143,13 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         if (handler.isEmpty() && charger.isEmpty() && follower.isEmpty()) {
             return false;
         }
-        if (OPTION_PERSON_HANDLE == personType && handler.contains(personName)) {
+        if (OPTION_PERSON_HANDLE.id == personType && handler.contains(personName)) {
             return true;
         }
-        if (OPTION_PERSON_CHARGE == personType && charger.contains(personName)) {
+        if (OPTION_PERSON_CHARGE.id == personType && charger.contains(personName)) {
             return true;
         }
-        if (OPTION_PERSON_FOLLOW == personType && follower.contains(personName)) {
+        if (OPTION_PERSON_FOLLOW.id == personType && follower.contains(personName)) {
             return true;
         }
         return false;
@@ -163,7 +163,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         if (state.id == AssignmentState){
             return true;
         }
-        if (OPTION_ASSIGN_FINISH != AssignmentState && OPTION_ASSIGN_FINISH != state.id){
+        if (OPTION_ASSIGN_FINISH.id != AssignmentState && OPTION_ASSIGN_FINISH.id != state.id){
             return true;
         }
         return false;

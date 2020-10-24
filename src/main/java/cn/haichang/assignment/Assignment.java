@@ -54,7 +54,7 @@ public interface Assignment {
     /** 优先级-全部*/
     NameItems LEVELS = NameItems.valueOf(OPTION_LEVEL_HIGHEST,OPTION_LEVEL_HIGH,OPTION_LEVEL_MIDDLE,OPTION_LEVEL_LOW);
 
-    /* 状态-任务是否删除*/
+    /** 状态-任务是否删除*/
     NameItem STATE_DELETE = NameItem.valueOf("删除", 14);
 
     /**
@@ -65,21 +65,17 @@ public interface Assignment {
 
     void setTitle(String title);
     void setContent(String content);
-
     void addHandler(Set<String> handlers);
-    void removeHandler(String handler);
+    void removeHandler(String handler) throws ApiException;
     void addFollower(String follower);
     void setCharger(String charger);
-
     void setLableId(String lableId);
-
     void setStartTime(Date startTime);
     void setEndTime(Date endTime);
 
 
     String getTitle();
     String getContent();
-
     Set<String> getHandler();
     Set<String> getFollower();
     String getCharger();
@@ -89,19 +85,18 @@ public interface Assignment {
     Date getEndTime();
     Date getCreateTime();
     Date getFinishTime();
-
     NameItem getLevel();
     NameItem getState();
-
     String getFatherId();
 
-
+    /* 设置优先级*/
     void LevelHighest();
     void LevelHigh();
     void LevelMiddle();
     void LevelLow();
-
+    /*删除任务*/
     void delete();
+    /*判断任务是否删除*/
     boolean isDelete();
     /* 状态扭转*/
     void turnEstimate() throws ApiException;
@@ -114,15 +109,17 @@ public interface Assignment {
     void turnOnLine() throws ApiException;
     void turnReject() throws ApiException;
     void turnPending() throws ApiException;
-
+    /*任务的缺陷分析*/
     int getBugsCount();
     int getBugsFinishCount();
-
     Map<String, Integer> getStateAnalysis();
-
     Map<String ,Integer> getTesterAndCount();
     Map<String ,Integer> getHandlerAndCount();
-    
+
+    /**
+     * 获取日志列表
+     * @return
+     */
     ResultPage<BusinessLog> getLogs();
 
 }

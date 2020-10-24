@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author HaiChang
@@ -62,6 +63,9 @@ public class AssignmentMethods {
         int level = params.getLevel();
         ValidateUtil.isEmpty(title, "标题不能为空");
         ValidateUtil.isEmpty(content, "内容不能为空");
+        ValidateUtil.isEmpty(lableId, "标签不能为空");
+        ValidateUtil.isEmpty(startTime, "预计开始时间不能为空");
+        ValidateUtil.isEmpty(endTime, "预计结束时间能为空");
         Assignment assignment = m_AssignmentService.createAssignment(title
         , content, getCreator(), handlers, charger, lableId, startTime
         ,endTime,level);
@@ -83,6 +87,10 @@ public class AssignmentMethods {
         int level = params.getLevel();
         ValidateUtil.isEmpty(title, "标题不能为空");
         ValidateUtil.isEmpty(content, "内容不能为空");
+        ValidateUtil.isEmpty(lableId, "标签不能为空");
+        ValidateUtil.isEmpty(startTime, "预计开始时间不能为空");
+        ValidateUtil.isEmpty(endTime, "预计结束时间能为空");
+        ValidateUtil.isEmpty(fatherId, "父Id不能为空");
         Assignment assignment = m_AssignmentService.createAssignmentSon(title
                 , content, getCreator(), handlers, charger, lableId, startTime
                 ,endTime,level,fatherId);
@@ -93,8 +101,10 @@ public class AssignmentMethods {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
     @DocMethod(description = "通过任务id获取任务",index = 2)
-    public AssignmentView get(FriendlyObject params){
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("assignmentId"));
+    public AssignmentView get(FriendlyObject params) throws ApiException {
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
         return AssignmentView.valueOf(assignment);
     }
 
@@ -102,8 +112,10 @@ public class AssignmentMethods {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "LableId",type = String.class,necessary = true,description = "标签id"))
     @DocMethod(description = "通过标签id获取任务",index = 3)
-    public ResultPage<AssignmentImpl> getByLableId(FriendlyObject params){
-        Lable lableId = m_AssignmentService.getLable(params.getString("LableId"));
+    public ResultPage<AssignmentImpl> getByLableId(FriendlyObject params) throws ApiException {
+        String id = params.getString("LableId");
+        ValidateUtil.isEmpty(id, "标签Id不能为空");
+        Lable lableId = m_AssignmentService.getLable(id);
         return lableId.getAssignments();
     }
 
@@ -111,17 +123,22 @@ public class AssignmentMethods {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "fatherId",type = String.class,necessary = true,description = "父id"))
     @DocMethod(description = "通过父id获取子任务",index = 4)
-    public ResultPage<Assignment> getByfahterId(FriendlyObject params){
-        return m_AssignmentService.getSonAssignments(params.getString("fatherId"));
+    public ResultPage<Assignment> getByfahterId(FriendlyObject params) throws ApiException {
+        String fatherId = params.getString("fatherId");
+        ValidateUtil.isEmpty(fatherId, "父Id不能为空");
+        return m_AssignmentService.getSonAssignments(fatherId);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
     @DocMethod(description = "通过条件查询获取任务" , index = 5)
-    public ResultPage<Assignment> getByCondition(ConditionQueryAssignmentParam params){
+    public ResultPage<Assignment> getByCondition(ConditionQueryAssignmentParam params) throws ApiException {
         String personName = params.getPersonName();
         int personType = params.getPersonType();
         int conditionState = params.getConditionState();
+        ValidateUtil.isEmpty(personName, "人名不能为空");
+        ValidateUtil.isEmpty(personType, "类型不能为空");
+        ValidateUtil.isEmpty(conditionState, "任务状态不能为空");
         return m_AssignmentService.searchAssignment(personName,personType,conditionState);
     }
 
@@ -129,8 +146,10 @@ public class AssignmentMethods {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "keywords",type = String.class,necessary = true,description = "搜索关键词"))
     @DocMethod(description = "通过关键词获取任务",index = 6)
-    public ResultPage<Assignment> getByKeyWord(FriendlyObject params){
-        return m_AssignmentService.getByKeyWord(params.getString("keywords"));
+    public ResultPage<Assignment> getByKeyWord(FriendlyObject params) throws ApiException {
+        String keywords = params.getString("keywords");
+        ValidateUtil.isEmpty(keywords, "关键词不能为空");
+        return m_AssignmentService.getByKeyWord(keywords);
     }
 
     @KeepServiceOrigin
@@ -160,12 +179,26 @@ public class AssignmentMethods {
         }
 
         assignment.addHandler(new HashSet<>(params.getHandlers()));
-        assignment.addFollower(params.getFollowers());
-        assignment.setCharger(params.getCharger());
+        String followers = params.getFollowers();
+        assignment.addFollower(followers);
+
+        String charger = params.getCharger();
+        if (!StringUtil.isEmpty(charger)){
+            assignment.setCharger(params.getCharger());
+        }
         /*修改标签*/
-        assignment.setLableId(params.getLableId());
-        assignment.setStartTime(params.getStartTime());
-        assignment.setEndTime(params.getEndTime());
+        String lableId = params.getLableId();
+        if (!StringUtil.isEmpty(lableId)){
+            assignment.setLableId(lableId);
+        }
+        Date startTime = params.getStartTime();
+        if (null != startTime){
+            assignment.setStartTime(startTime);
+        }
+        Date endTime = params.getEndTime();
+        if (null != endTime){
+        assignment.setEndTime(endTime);
+        }
         int level = params.getLevel();
         if (Assignment.OPTION_LEVEL_HIGHEST.id == level){
             assignment.LevelHighest();
@@ -198,7 +231,7 @@ public class AssignmentMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "assignmentId", type = String.class,necessary = true, description = "待删除的任务Id"))
-    @DocMethod(description = "删除任务", index = 9)
+    @DocMethod(description = "删除任务", index = 10)
     public String delete(FriendlyObject params) throws ApiException {
         m_AssignmentService.deleteaAssignment(params.getString("assignmentId"));
         return "删除成功";
@@ -207,9 +240,11 @@ public class AssignmentMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "assignmentId", type = String.class,necessary = true, description = "待删除的任务Id"))
-    @DocMethod(description = "获取缺陷分析", index = 9)
-    public BugAnalysisView getBugAnalysis(FriendlyObject params){
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("assignmentId"));
+    @DocMethod(description = "获取缺陷分析", index = 11)
+    public BugAnalysisView getBugAnalysis(FriendlyObject params) throws ApiException {
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
         int bugsCount = assignment.getBugsCount();
         int bugsFinishCount = assignment.getBugsFinishCount();
         Map<String, Integer> stateAnalysis = assignment.getStateAnalysis();
@@ -222,99 +257,112 @@ public class AssignmentMethods {
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至评估中",index = 10)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至评估中",index = 12)
     public AssignmentView turnEstimate(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
         assignment.turnEstimate();
         return AssignmentView.valueOf(assignment);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至规划中",index = 11)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至规划中",index = 13)
     public AssignmentView turnPlanning(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
         assignment.turnPlanning();
         return AssignmentView.valueOf(assignment);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至待开发",index = 12)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至待开发",index = 14)
     public AssignmentView turnWaitingDevelop(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
         assignment.turnWaitingDevelop();
         return AssignmentView.valueOf(assignment);
     }
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至开发中",index = 13)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至开发中",index = 15)
     public AssignmentView turnDevelop(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        assignment.turnDevelop();
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);        assignment.turnDevelop();
         return AssignmentView.valueOf(assignment);
     }
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至待测试",index = 14)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至待测试",index = 16)
     public AssignmentView turnWaitingTest(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        assignment.turnWaitingTest();
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);        assignment.turnWaitingTest();
         return AssignmentView.valueOf(assignment);
     }
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至测试中",index = 15)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至测试中",index = 17)
     public AssignmentView turnTesting(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        assignment.turnTesting();
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);        assignment.turnTesting();
         return AssignmentView.valueOf(assignment);
     }
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至测试通过",index = 16)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至测试通过",index = 18)
     public AssignmentView turnPassTest(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        assignment.turnPassTest();
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);        assignment.turnPassTest();
         return AssignmentView.valueOf(assignment);
     }
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至上线",index = 17)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至上线",index = 19)
     public AssignmentView turnOnLine(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        assignment.turnOnLine();
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);        assignment.turnOnLine();
         return AssignmentView.valueOf(assignment);
     }
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至已拒绝",index = 18)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至已拒绝",index = 20)
     public AssignmentView turnReject(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        assignment.turnReject();
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);        assignment.turnReject();
         return AssignmentView.valueOf(assignment);
     }
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "AssignmentId",type = String.class,necessary = true,description = "任务id"))
-    @DocMethod(description = "任务状态扭转至挂起",index = 19)
+    @DocParameter(@DocAttribute(name = "assignmentId",type = String.class,necessary = true,description = "任务id"))
+    @DocMethod(description = "任务状态扭转至挂起",index = 21)
     public AssignmentView turnPending(FriendlyObject params) throws ApiException {
-        Assignment assignment = m_AssignmentService.getAssignment(params.getString("AssignmentId"));
-        assignment.turnPending();
+        String assignmentId = params.getString("assignmentId");
+        ValidateUtil.isEmpty(assignmentId, "任务Id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);        assignment.turnPending();
         return AssignmentView.valueOf(assignment);
     }
 
     @WeforwardMethod
-    @DocMethod(description = "获取任务日志", index = 20)
+    @DocMethod(description = "获取任务日志", index = 22)
     public ResultPage<LogView> logs(LogsParam params) throws ApiException {
         String id = params.getId();
         ValidateUtil.isEmpty(id, "id不能为空");

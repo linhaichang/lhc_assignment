@@ -152,31 +152,18 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         return STATES_BUGS.get(m_State);
     }
 
-
-//    @Override
-//    public boolean isSolved() {
-//        return m_IsSolved;
-//    }
-//
-//    @Override
-//    public void setSolved(boolean solved) {
-//        m_IsSolved = solved;
-//        markPersistenceUpdate();
-//    }
-
     @Override
     public String getCreator() {
         return m_Creator;
     }
 
-    @Override
-    public Date getCreateTime() {
-        return m_CreateTime;
-    }
 
     @Override
     public void setLastTime(Date lastTime) {
         m_LastTime = lastTime;
+        if (m_LastTime.toString() == lastTime.toString()){
+            return;
+        }
         markPersistenceUpdate();
     }
 
@@ -186,7 +173,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
     }
 
     @Override
-    public synchronized void turnWaitingCorrcet() throws ApiException {
+    public synchronized void turnWaitingCorrect() throws ApiException {
         NameItem state = getState();
         if (STATE_WAIT_CORRECT.id == state.id){
             return;
@@ -313,14 +300,15 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
     @Override
     public void deleteBug() {
         m_IsDelete = STATE_DELETE.id;
+        markPersistenceUpdate();
     }
 
     private String getUser() {
-        String user = Global.TLS.getValue("creator");
-        if (null == user) {
-            user = "creator";
+        String creator = Global.TLS.getValue("creator");
+        if (null == creator) {
+            creator = "creator";
         }
-        return user;
+        return creator;
     }
 
     @Override
