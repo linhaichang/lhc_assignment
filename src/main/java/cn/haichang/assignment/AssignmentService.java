@@ -1,17 +1,14 @@
 package cn.haichang.assignment;
 
-import cn.haichang.assignment.impl.AssignmentImpl;
-import cn.haichang.assignment.weforward.Bug;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
-import cn.weforward.data.UniteId;
 import cn.weforward.framework.ApiException;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 /**
+ * 任务服务
  * @author HaiChang
  * @date 2020/10/19
  **/

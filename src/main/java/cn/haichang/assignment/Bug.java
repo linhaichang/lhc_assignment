@@ -1,4 +1,4 @@
-package cn.haichang.assignment.weforward;
+package cn.haichang.assignment;
 
 import cn.weforward.common.NameItem;
 import cn.weforward.common.NameItems;
@@ -60,8 +60,7 @@ public interface Bug {
     NameItem getState();
 
     String getCreator();
-
-
+    
     void setLastTime(Date lastTime);
     Date getLastTime();
     /*状态扭转*/

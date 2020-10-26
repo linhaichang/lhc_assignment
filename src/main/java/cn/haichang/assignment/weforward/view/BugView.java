@@ -1,7 +1,6 @@
 package cn.haichang.assignment.weforward.view;
 
-import cn.haichang.assignment.Assignment;
-import cn.haichang.assignment.weforward.Bug;
+import cn.haichang.assignment.Bug;
 import cn.weforward.protocol.doc.annotation.DocAttribute;
 import cn.weforward.protocol.doc.annotation.DocObject;
 

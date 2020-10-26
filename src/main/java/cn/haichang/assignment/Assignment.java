@@ -63,14 +63,59 @@ public interface Assignment {
      */
     UniteId getId();
 
+    /**
+     * 标题
+     * @param title
+     */
     void setTitle(String title);
+
+    /**
+     * 内容
+     * @param content
+     */
     void setContent(String content);
+
+    /**
+     * 增加处理人
+     * @param handlers
+     */
     void addHandler(Set<String> handlers);
+
+    /**
+     * 移除处理人
+     * @param handler
+     * @throws ApiException
+     */
     void removeHandler(String handler) throws ApiException;
+
+    /**
+     * 增加跟进人
+     * @param follower
+     */
     void addFollower(String follower);
+
+    /**
+     * 负责人
+     * @param charger
+     */
     void setCharger(String charger);
+
+    /**
+     * 标签id
+     * @param lableId
+     */
     void setLableId(String lableId);
+
+    /**
+     * 预计开始时间
+     * @param startTime
+     */
     void setStartTime(Date startTime);
+
+    /**
+     * 预计结束时间
+     * @param endTime
+     */
     void setEndTime(Date endTime);
 
 
@@ -109,11 +154,36 @@ public interface Assignment {
     void turnOnLine() throws ApiException;
     void turnReject() throws ApiException;
     void turnPending() throws ApiException;
+
     /*任务的缺陷分析*/
+    /**
+     * 调用Di获取当前任务的总缺陷数量
+     * @return
+     */
     int getBugsCount();
+
+    /**
+     * 调用Di获取当前任务的已完成缺陷数量
+     * @return
+     */
     int getBugsFinishCount();
+
+    /**
+     * 调用Di获取当前任务的缺陷分析
+     * @return
+     */
     Map<String, Integer> getStateAnalysis();
+
+    /**
+     * 调用Di获取当前任务的测试人员所测试缺陷的总数
+     * @return
+     */
     Map<String ,Integer> getTesterAndCount();
+
+    /**
+     * 调用Di获取当前任务缺陷的各处理人的处理总数
+     * @return
+     */
     Map<String ,Integer> getHandlerAndCount();
 
     /**

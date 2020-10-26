@@ -129,10 +129,10 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
 
     @Override
     public void setContent(String content) {
-        if(StringUtil.eq(content, m_Title)){
+        if(StringUtil.eq(content, m_Content)){
             return;
         }
-        m_Title=content;
+        m_Content=content;
         getBusinessDi().writeLog(getId(), m_Creator,"修改内容", "", "");
         markPersistenceUpdate();
     }

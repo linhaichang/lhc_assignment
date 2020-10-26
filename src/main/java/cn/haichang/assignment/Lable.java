@@ -7,12 +7,17 @@ import cn.weforward.data.UniteId;
 import java.util.List;
 
 /**
+ * 标签
  * @author HaiChang
  * @date 2020/10/16
  **/
 public interface Lable {
     UniteId getId();
 
+    /**
+     * 标签名
+     * @param lableName
+     */
     void setLableName(String lableName);
     String getLableName();
 

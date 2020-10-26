@@ -1,7 +1,7 @@
 package cn.haichang.assignment.impl;
 
 import cn.haichang.assignment.di.AssignmentDi;
-import cn.haichang.assignment.weforward.Bug;
+import cn.haichang.assignment.Bug;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;

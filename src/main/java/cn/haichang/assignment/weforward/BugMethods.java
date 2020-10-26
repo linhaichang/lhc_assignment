@@ -1,6 +1,7 @@
 package cn.haichang.assignment.weforward;
 
 import cn.haichang.assignment.AssignmentService;
+import cn.haichang.assignment.Bug;
 import cn.haichang.assignment.weforward.param.BugParam;
 import cn.haichang.assignment.weforward.param.LogView;
 import cn.haichang.assignment.weforward.param.LogsParam;

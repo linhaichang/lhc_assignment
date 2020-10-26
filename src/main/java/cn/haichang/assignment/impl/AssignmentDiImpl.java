@@ -1,28 +1,20 @@
 package cn.haichang.assignment.impl;
 
-import cn.haichang.assignment.Assignment;
-import cn.haichang.assignment.Lable;
 import cn.haichang.assignment.di.AssignmentDi;
-import cn.haichang.assignment.weforward.Bug;
+import cn.haichang.assignment.Bug;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
-import cn.weforward.common.util.StringUtil;
 import cn.weforward.data.UniteId;
 import cn.weforward.data.log.BusinessLog;
 import cn.weforward.data.log.BusinessLogger;
 import cn.weforward.data.log.BusinessLoggerFactory;
-import cn.weforward.data.persister.Condition;
 import cn.weforward.data.persister.Persistent;
 import cn.weforward.data.persister.Persister;
 import cn.weforward.data.persister.PersisterFactory;
 import cn.weforward.data.persister.ext.ConditionUtil;
-import cn.weforward.framework.WeforwardSession;
-import cn.weforward.protocol.ops.User;
 
-import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * di实现
@@ -37,7 +29,6 @@ public class AssignmentDiImpl implements AssignmentDi {
     protected Persister<BugImpl> m_PsBug;
 
     protected BusinessLogger m_BusinessLogger;
-
 
     public AssignmentDiImpl(PersisterFactory factory, BusinessLoggerFactory loggerFactory) {
         m_Factory = factory;
@@ -136,7 +127,7 @@ public class AssignmentDiImpl implements AssignmentDi {
 
     /**
      * 统计字符串数组中元素的出现次数
-     * @param arr
+     * @param arr 字符串数组
      * @return 统计结果
      */
     private static Map<String,Integer> statistics(String[] arr){
