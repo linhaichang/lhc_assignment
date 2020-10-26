@@ -1,6 +1,7 @@
 package cn.haichang.assignment.weforward.param;
 
 import cn.weforward.protocol.doc.annotation.DocAttribute;
+import cn.weforward.protocol.doc.annotation.DocObject;
 
 import java.util.List;
 
@@ -8,6 +9,7 @@ import java.util.List;
  * @author HaiChang
  * @date 2020/10/22
  **/
+@DocObject(description = "更新缺陷参数")
 public class UpdateBugParam{
     protected String m_BugContent;
     protected int m_Severity;

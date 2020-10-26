@@ -3,13 +3,10 @@ package cn.haichang.assignment;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.NameItems;
 import cn.weforward.common.ResultPage;
-import cn.weforward.common.util.StringUtil;
 import cn.weforward.data.UniteId;
 import cn.weforward.data.log.BusinessLog;
 import cn.weforward.framework.ApiException;
-
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -175,7 +172,7 @@ public interface Assignment {
     Map<String, Integer> getStateAnalysis();
 
     /**
-     * 调用Di获取当前任务的测试人员所测试缺陷的总数
+     * 调用Di获取当前任务缺陷各测人的缺陷总量
      * @return
      */
     Map<String ,Integer> getTesterAndCount();

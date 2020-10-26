@@ -35,15 +35,7 @@ public class BugParam {
         this.m_BugContent = BugContent;
     }
 
-    @DocAttribute(necessary = true, description = "严重性", example = "32")
-    public int getSeverity() {
-        return m_Severity;
-    }
-    public void setSeverity(int Severity) {
-        this.m_Severity = Severity;
-    }
-
-    @DocAttribute(description = "测试人员", example = "\"小马\",\"小云\"")
+    @DocAttribute(description = "测试人员", example = "小马")
     public List<String> getTesters() {
         return m_Testers;
     }
@@ -59,6 +51,12 @@ public class BugParam {
         this.m_VersionAndPlatform = VersionAndPlatform;
     }
 
-
+    @DocAttribute(necessary = true, description = "严重性", example = "32")
+    public int getSeverity() {
+        return m_Severity;
+    }
+    public void setSeverity(int Severity) {
+        this.m_Severity = Severity;
+    }
 
 }

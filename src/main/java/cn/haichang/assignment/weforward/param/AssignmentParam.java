@@ -17,13 +17,12 @@ public class AssignmentParam {
     protected String m_Title;
     protected String m_Content;
     protected List<String> m_Handlers;
-    protected String  m_Followers;
     protected String m_Charger;
     protected String  m_LableId;
     protected Date m_StartTime;
     protected Date m_EndTime;
     protected int m_Level;
-    protected int m_State;
+
 
     @DocAttribute(necessary = true,description = "需求标题",example = "我是需求标题")
     public String getTitle() {
@@ -49,14 +48,7 @@ public class AssignmentParam {
     public void setHandlers(List<String> m_Handlers) {
         this.m_Handlers = m_Handlers;
     }
-    @DocAttribute(description = "跟进人",example = "小思")
-    public String  getFollowers() {
-        return m_Followers;
-    }
 
-    public void setFollowers(String m_Followers) {
-        this.m_Followers = m_Followers;
-    }
     @DocAttribute(necessary = true,description = "负责人",example = "小聪")
     public String getCharger() {
         return m_Charger;
@@ -96,12 +88,6 @@ public class AssignmentParam {
     public void setLevel(int level){
         this.m_Level = level;
     }
-   /* @DocAttribute(necessary = true,description = "任务状态",example = "0-9")
-    public int getState() {
-        return m_State;
-    }
-    public void setState(int state){
-        m_State = state;
-    }*/
+
 
 }

@@ -8,8 +8,10 @@ import cn.haichang.assignment.weforward.param.LableParam;
 import cn.haichang.assignment.weforward.param.UpdateAssignmentParam;
 import cn.haichang.assignment.weforward.param.UpdateLableParam;
 import cn.haichang.assignment.weforward.view.LableView;
+import cn.haichang.assignment.weforward.view.SimpleLableView;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
+import cn.weforward.common.util.TransResultPage;
 import cn.weforward.framework.ApiException;
 import cn.weforward.framework.KeepServiceOrigin;
 import cn.weforward.framework.WeforwardMethod;
@@ -82,10 +84,15 @@ public class LableMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocMethod(description = "获取所有标签", index = 2)
-    public ResultPage<Lable> getAll(){
-        return m_AssignmentService.getAllLables();
+    public ResultPage<SimpleLableView> getAll() {
+        ResultPage<Lable> rp = m_AssignmentService.getAllLables();
+        return new TransResultPage<SimpleLableView, Lable>(rp) {
+            @Override
+            protected SimpleLableView trans(Lable src) {
+                return SimpleLableView.valueOf(src);
+            }
+        };
     }
-
     @KeepServiceOrigin
     @WeforwardMethod
     @DocMethod(description = "修改标签名", index = 3)

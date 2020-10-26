@@ -21,7 +21,7 @@ public class LogsParam extends DocPageParams {
         m_Id = id;
     }
 
-    @DocAttribute(description = "id")
+    @DocAttribute(description = "目标的id")
     public String getId() {
         return m_Id;
     }

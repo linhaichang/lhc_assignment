@@ -1,5 +1,6 @@
 package cn.haichang.assignment.impl;
 
+import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.di.AssignmentDi;
 import cn.haichang.assignment.Bug;
 import cn.weforward.common.NameItem;
@@ -47,15 +48,29 @@ public class AssignmentDiImpl implements AssignmentDi {
     }
 
 
+    /**
+     * 获取缺陷总数
+     * @param AssignmentId 任务id
+     * @return 该任务的缺陷总数
+     */
     @Override
     public int getBugsCount(String AssignmentId) {
         return m_PsBug.startsWith(AssignmentId).getCount();
     }
 
+    /**
+     * 获取已完成的缺陷总数
+     * @param assignmentId 任务id
+     * @return 该任务已完成的缺陷总数
+     */
     @Override
     public int getBugsFinishCount(String assignmentId) {
         ResultPage<BugImpl> rp = m_PsBug.startsWith(assignmentId);
+        //首先获得缺陷总数
         int allCount = getBugsCount(assignmentId);
+        /*循环获得状态为已解决、不作修改、不能修改的缺陷数量，
+         *并用总数减之
+         */
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
             if (Bug.STATE_SOLVED.id != bug.getState().id &&
                     Bug.STATE_NO_EDIT.id != bug.getState().id &&
@@ -66,21 +81,32 @@ public class AssignmentDiImpl implements AssignmentDi {
         return allCount;
     }
 
+    /**
+     * 获取缺陷分析
+     * @param assignmentId
+     * @return
+     */
     @Override
     public Map<String, Integer> getStateAnalysis(String assignmentId) {
         ResultPage<BugImpl> rp = m_PsBug.startsWith(assignmentId);
         Map<String ,Integer> map = new HashMap<>(Bug.STATES_BUGS.size());
+        //首先遍历出缺陷的状态
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
             NameItem nameItem = Bug.STATES_BUGS.get(bug.getState().id);
             String stateName = nameItem.name;
+            //如果map中没有该状态，则该状态数量为0。如有该状态，则该状态为map的key
             Integer count = null == map.get(stateName) ? 0 : map.get(stateName);
+            //数量+1
             map.put(stateName,++count);
         }
         return map;
     }
 
-
-
+    /**
+     * 统计每个测试人员负责的缺陷总数
+     * @param AssignmentId
+     * @return
+     */
     @Override
     public Map<String, Integer> getTesterAndCount(String AssignmentId) {
         ArrayList<String > list = new ArrayList<>();
@@ -91,11 +117,14 @@ public class AssignmentDiImpl implements AssignmentDi {
                 list.add(tester);
             }
         }
-        String [] testArr = list.toArray(new String[list.size()]);
-        return statistics(testArr);
+        return statistics(list);
     }
 
-
+    /**
+     * 统计每个负责人员负责的缺陷总数
+     * @param AssignmentId
+     * @return
+     */
     @Override
     public Map<String, Integer> getHandlerAndCount(String AssignmentId) {
         ArrayList<String > list = new ArrayList<>();
@@ -106,10 +135,25 @@ public class AssignmentDiImpl implements AssignmentDi {
                 list.add(handler);
             }
         }
-        String [] HandArr =  list.toArray(new String[list.size()]);
-        return statistics(HandArr);
+        return statistics(list);
     }
 
+    /**
+     * 统计字符串列表中元素的出现次数
+     * @param list 字符串列表
+     * @return 统计结果
+     */
+    private static Map<String,Integer> statistics(List<String > list){
+        HashMap<String , Integer> map = new HashMap<>();
+        for (int i = 0; i < list.size(); i++) {
+            if (map.get(list.get(i))!=null){
+                map.put(list.get(i),map.get(list.get(i))+1);
+            }else {
+                map.put(list.get(i),1);
+            }
+        }
+        return map;
+    }
     @Override
     public void writeLog(UniteId id, String user,String action, String what, String note) {
         m_BusinessLogger.writeLog(id.getId(), user, action, what, note);
@@ -125,20 +169,4 @@ public class AssignmentDiImpl implements AssignmentDi {
         return m_Factory.getPersister(clazz);
     }
 
-    /**
-     * 统计字符串数组中元素的出现次数
-     * @param arr 字符串数组
-     * @return 统计结果
-     */
-    private static Map<String,Integer> statistics(String[] arr){
-        HashMap<String , Integer> map = new HashMap<>();
-        for (int i = 0; i < arr.length; i++) {
-            if (map.get(arr[i])!=null){
-                map.put(arr[i],map.get(arr[i])+1);
-            }else {
-                map.put(arr[i],1);
-            }
-        }
-        return map;
-    }
 }

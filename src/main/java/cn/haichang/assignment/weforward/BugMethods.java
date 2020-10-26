@@ -7,6 +7,7 @@ import cn.haichang.assignment.weforward.param.LogView;
 import cn.haichang.assignment.weforward.param.LogsParam;
 import cn.haichang.assignment.weforward.param.UpdateBugParam;
 import cn.haichang.assignment.weforward.view.BugView;
+import cn.haichang.assignment.weforward.view.SimpleBugView;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;
 import cn.weforward.common.util.TransResultPage;
@@ -58,17 +59,27 @@ public class BugMethods {
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "assignmentId", type = String.class, necessary = true, description = "任务Id"))
+    @DocParameter({
+            @DocAttribute(name = "assignmentId", type = String.class, necessary = true, description = "任务Id"),
+            @DocAttribute(name = "page", type = Integer.class, necessary = true, description = "第几页"),
+            @DocAttribute(name = "pageSize", type = Integer.class, necessary = true, description = "一页的大小")
+    })
     @DocMethod(description = "根据任务Id搜索Bug", index = 1)
-    public ResultPage<Bug> getBugByAssignmentId(FriendlyObject params) throws ApiException {
+    public ResultPage<SimpleBugView> getBugByAssignmentId(FriendlyObject params) throws ApiException {
         String id = params.getString("assignmentId");
         ValidateUtil.isEmpty(id, "任务id不能为空");
-        return m_AssignmentService.getBugByAssignmentId(id);
+        ResultPage<Bug> rp = m_AssignmentService.getBugByAssignmentId(id);
+        return new TransResultPage<SimpleBugView,Bug>(rp) {
+            @Override
+            protected SimpleBugView trans(Bug src) {
+                return SimpleBugView.valueOf(src);
+            }
+        };
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId", type = String.class, necessary = true, description = "BugId"))
+    @DocParameter(@DocAttribute(name = "BugId", type = String.class, necessary = true, description = "缺陷id"))
     @DocMethod(description = "根据BugId搜索Bug", index = 2)
     public BugView getBugByBugId(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
@@ -78,14 +89,23 @@ public class BugMethods {
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "keywords",type = String.class,necessary = true,description = "搜索关键词"))
+    @DocParameter({
+            @DocAttribute(name = "keywords", type = String.class, necessary = true, description = "搜索关键词"),
+            @DocAttribute(name = "page", type = Integer.class, necessary = true, description = "第几页"),
+            @DocAttribute(name = "pageSize", type = Integer.class, necessary = true, description = "一页的大小")
+    })
     @DocMethod(description = "通过关键词获取Bug",index = 3)
-    public ResultPage<Bug> getByKeyWord(FriendlyObject params) throws ApiException {
+    public ResultPage<SimpleBugView> getByKeyWord(FriendlyObject params) throws ApiException {
         String keywords = params.getString("keywords");
         ValidateUtil.isEmpty(keywords, "关键字id不能为空");
-        return m_AssignmentService.getBugByKeyWord(keywords);
+        ResultPage<Bug> rp = m_AssignmentService.getBugByKeyWord(keywords);
+        return new TransResultPage<SimpleBugView,Bug>(rp) {
+            @Override
+            protected SimpleBugView trans(Bug src) {
+                return SimpleBugView.valueOf(src);
+            }
+        };
     }
-
 
     @KeepServiceOrigin
     @WeforwardMethod
@@ -119,105 +139,97 @@ public class BugMethods {
         }else if (Bug.OPTION_SEVERITY_ADVISE.id == severity){
             bug.setSeverity(Bug.OPTION_SEVERITY_ADVISE.id);
         }else {
-            throw new ApiException(0, "无此选项，选项参数为，31-34");
+            throw new ApiException(0, "无此选项，选项参数为");
         }
         return BugView.valueOf(bug);
     }
     /*状态扭转*/
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
-    @DocMethod(description = "缺陷状态扭转至待纠正中",index = 5)
-    public BugView turnWaitingCorrect(FriendlyObject params) throws ApiException {
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
+    @DocMethod(description = "缺陷状态扭转至待修正",index = 5)
+    public void turnWaitingCorrect(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnWaitingCorrect();
-        return BugView.valueOf(bug);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
     @DocMethod(description = "缺陷状态扭转至待复测中",index = 6)
-    public BugView turnWaitingRetest(FriendlyObject params) throws ApiException {
+    public void turnWaitingRetest(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnWaitingRetest();
-        return BugView.valueOf(bug);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
     @DocMethod(description = "缺陷状态扭转至建议不作修改",index = 7)
-    public BugView turnAdviseDontEdit(FriendlyObject params) throws ApiException {
+    public void turnAdviseDontEdit(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnAdviseDontEdit();
-        return BugView.valueOf(bug);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
     @DocMethod(description = "缺陷状态扭转至申请无法修改",index = 8)
-    public BugView turnAskingCantEdit(FriendlyObject params) throws ApiException {
+    public void turnAskingCantEdit(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnAskingCantEdit();
-        return BugView.valueOf(bug);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
     @DocMethod(description = "缺陷状态扭转至已解决",index = 9)
-    public BugView turnSolved(FriendlyObject params) throws ApiException {
+    public void turnSolved(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnSolved();
-        return BugView.valueOf(bug);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
     @DocMethod(description = "缺陷状态扭转至不作修改",index = 10)
-    public BugView turnNoEdit(FriendlyObject params) throws ApiException {
+    public void turnNoEdit(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnNoEdit();
-        return BugView.valueOf(bug);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
     @DocMethod(description = "缺陷状态扭转至无法修改",index = 11)
-    public BugView turnCantSolved(FriendlyObject params) throws ApiException {
+    public void turnCantSolved(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnCantSolved();
-        return BugView.valueOf(bug);
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
-    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "Bugid"))
+    @DocParameter(@DocAttribute(name = "BugId",type = String.class,necessary = true,description = "缺陷id"))
     @DocMethod(description = "缺陷状态扭转至重新打开",index = 12)
-    public BugView turnReopen(FriendlyObject params) throws ApiException {
+    public void turnReopen(FriendlyObject params) throws ApiException {
         String bugId = params.getString("BugId");
         ValidateUtil.isEmpty(bugId, "缺陷id不能为空");
         Bug bug = m_AssignmentService.getBug(bugId);
         bug.turnReopen();
-        return BugView.valueOf(bug);
     }
 
     @WeforwardMethod

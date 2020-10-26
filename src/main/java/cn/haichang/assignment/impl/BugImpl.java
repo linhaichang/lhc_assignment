@@ -1,7 +1,7 @@
 package cn.haichang.assignment.impl;
 
-import cn.haichang.assignment.di.AssignmentDi;
 import cn.haichang.assignment.Bug;
+import cn.haichang.assignment.di.AssignmentDi;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;
@@ -62,7 +62,7 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         m_IsSolved = false;
         m_Testers = tester;
         m_TestHandlers = new HashSet<>();
-        m_Creator = getCreator();
+        m_Creator = getUser();
         m_VersionAndPlatform = versionAndPlatform;
         m_CreateTime = new Date();
         m_LastTime = new Date();
@@ -86,6 +86,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         return m_BugContent;
     }
 
+    /**
+     * 设置缺陷内容
+     * @param content
+     */
     @Override
     public void setBugContent(String content) {
         if (StringUtil.eq(m_BugContent, content)){
@@ -101,6 +105,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         return m_Severity;
     }
 
+    /**
+     * 设置严重性
+     * @param severity
+     */
     @Override
     public void setSeverity(int severity) {
         int oldSeverity = m_Severity;
@@ -118,6 +126,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         return m_Testers;
     }
 
+    /**
+     * 增加测试人
+     * @param testers
+     */
     @Override
     public void setTesters(Set<String> testers) {
         Set<String> oldTesters = m_Testers;
@@ -135,6 +147,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         return m_TestHandlers;
     }
 
+    /**
+     * 增加处理人
+     * @param testHandlers
+     */
     @Override
     public void addTestHandler(Set<String> testHandlers) {
         if (0 == testHandlers.size()){
@@ -172,6 +188,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         return m_LastTime;
     }
 
+    /**
+     * 扭转为待修正
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnWaitingCorrect() throws ApiException {
         NameItem state = getState();
@@ -189,6 +209,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为待复测
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnWaitingRetest() throws ApiException {
         NameItem state = getState();
@@ -205,6 +229,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为建议不作修改
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnAdviseDontEdit() throws ApiException {
         NameItem state = getState();
@@ -220,6 +248,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为申请无法修改
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnAskingCantEdit() throws ApiException {
         NameItem state = getState();
@@ -235,6 +267,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为已解决
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnSolved() throws ApiException {
         NameItem state = getState();
@@ -250,6 +286,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为不作修改
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnNoEdit() throws ApiException {
         NameItem state = getState();
@@ -265,6 +305,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为无法修改
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnCantSolved() throws ApiException {
         NameItem state = getState();
@@ -280,6 +324,10 @@ public class BugImpl extends AbstractPersistent<AssignmentDi> implements Bug {
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转重新打开
+     * @throws ApiException
+     */
     @Override
     public synchronized void turnReopen() throws ApiException {
         NameItem state = getState();

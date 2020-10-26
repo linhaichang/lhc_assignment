@@ -5,13 +5,10 @@ import cn.haichang.assignment.Lable;
 import cn.haichang.assignment.di.AssignmentDi;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;
-import cn.weforward.common.util.TransList;
 import cn.weforward.data.UniteId;
 import cn.weforward.data.persister.support.AbstractPersistent;
 
 import javax.annotation.Resource;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author HaiChang
@@ -24,11 +21,7 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
     protected LableImpl(AssignmentDi di) {
         super(di);
     }
-    /**
-     * 以业务依赖接口构造对象
-     *
-     * @param di 业务依赖接口
-     */
+
     public LableImpl(AssignmentDi di, String lableName) {
         super(di);
         genPersistenceId(lableName);
@@ -55,6 +48,10 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
         return m_LableName;
     }
 
+    /**
+     * 获取标签下的所有任务
+     * @return
+     */
     @Override
     public ResultPage<AssignmentImpl> getAssignments() {
         ResultPage<AssignmentImpl> assignments = getBusinessDi().searchAssignmentByLableId(getId().getOrdinal());

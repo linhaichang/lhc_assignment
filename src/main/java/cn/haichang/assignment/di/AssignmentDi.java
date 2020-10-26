@@ -1,5 +1,6 @@
 package cn.haichang.assignment.di;
 
+import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.impl.AssignmentImpl;
 import cn.weforward.common.ResultPage;
 import cn.weforward.data.UniteId;

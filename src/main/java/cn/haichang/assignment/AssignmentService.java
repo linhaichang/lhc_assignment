@@ -1,6 +1,8 @@
 package cn.haichang.assignment;
 
+import cn.haichang.assignment.Bug;
 import cn.weforward.common.NameItem;
+import cn.weforward.common.NameItems;
 import cn.weforward.common.ResultPage;
 import cn.weforward.framework.ApiException;
 
@@ -17,19 +19,20 @@ public interface AssignmentService {
     NameItem OPTION_PERSON_CHARGE = NameItem.valueOf("选项：负责人", 1);
     NameItem OPTION_PERSON_FOLLOW = NameItem.valueOf("选项：跟进人", 2);
     NameItem OPTION_ASSIGN_FINISH = NameItem.valueOf("选项：任务完成", 7);
+    NameItems CONDITIONS = NameItems.valueOf(OPTION_ASSIGN_FINISH,OPTION_PERSON_CHARGE,OPTION_PERSON_FOLLOW,OPTION_PERSON_HANDLE);
 
     /**
      * 创建任务
      * @return
      */
-    Assignment createAssignment(String title, String content,String creator, Set<String> handlers,
+    Assignment createAssignment(String title, String content,/*String creator, */Set<String> handlers,
                                 String charger, String lableId, Date startTime,
                                 Date endTime,int level);
     /**
      * 创建子任务
      * @return
      */
-    Assignment createAssignmentSon(String title, String content,String creator, Set<String> handlers,
+    Assignment createAssignmentSon(String title, String content,/*String creator,*/ Set<String> handlers,
                                    String charger, String lableId, Date startTime,
                                    Date endTime,int level,String fatherId);
 
@@ -38,7 +41,7 @@ public interface AssignmentService {
      * @param id
      * @return
      */
-    Assignment getAssignment(String id);
+    Assignment getAssignment(String id) throws ApiException;
 
     /**
      * 通过 人名，人的类型(负责人，处理人，跟进人),任务是否完成条件 获取任务

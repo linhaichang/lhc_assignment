@@ -29,7 +29,7 @@ public interface Bug {
 
     NameItem OPTION_SEVERITY_ERROR = NameItem.valueOf("功能错误", 31);
     NameItem OPTION_SEVERITY_EFFECT = NameItem.valueOf("影响流程", 32);
-    NameItem OPTION_SEVERITY_NEWASSIGNMENT = NameItem.valueOf("信秀秋", 33);
+    NameItem OPTION_SEVERITY_NEWASSIGNMENT = NameItem.valueOf("新需求", 33);
     NameItem OPTION_SEVERITY_ADVISE = NameItem.valueOf("优化建议", 34);
     /** 全部严重性*/
     NameItems SEVERITY =NameItems.valueOf(OPTION_SEVERITY_ERROR,OPTION_SEVERITY_EFFECT,OPTION_SEVERITY_NEWASSIGNMENT,OPTION_SEVERITY_ADVISE);
@@ -60,7 +60,8 @@ public interface Bug {
     NameItem getState();
 
     String getCreator();
-    
+
+
     void setLastTime(Date lastTime);
     Date getLastTime();
     /*状态扭转*/

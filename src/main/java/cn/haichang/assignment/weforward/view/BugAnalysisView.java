@@ -40,7 +40,7 @@ public class BugAnalysisView {
         return m_FinishCount;
     }
 
-    @DocAttribute
+    @DocAttribute(description = "缺陷分析")
     public Map<String, Integer> getStateAnalysis() {
         return m_StateAnalysis;
     }

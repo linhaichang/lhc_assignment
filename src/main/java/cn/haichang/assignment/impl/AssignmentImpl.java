@@ -67,7 +67,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         genPersistenceId();
         m_Title=title;
         m_Content=content;
-        m_Creator= getCreator();
+        m_Creator= getUser();
         m_Handlers=handlers;
         m_Charger=charger;
         m_Followers=new HashSet<>();
@@ -85,18 +85,17 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
 
     /**
      * 子需求构造器，加上fatherID
-     *
      * @param di 业务依赖接口
      */
     public AssignmentImpl(AssignmentDi di, String title, String content,
                           Set<String> handlers, String charger,
                           String lableId, Date startTime, Date endTime,
-                          int level, String fatherId/*String creator*/) {
+                          int level, String fatherId) {
         super(di);
         genPersistenceId(fatherId);
         m_Title = title;
         m_Content = content;
-        m_Creator= Global.TLS.getValue("creator");
+        m_Creator= getUser();
         m_Handlers = handlers;
         m_Charger = charger;
         m_Followers=new HashSet<>();
@@ -197,22 +196,19 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
 
     @Override
     public void setStartTime(Date startTime) {
-        if (m_StartTime.toString() == startTime.toString()){
-            return;
-        }
         m_StartTime=startTime;
-        getBusinessDi().writeLog(getId(), m_Creator,"修改开始时间为", startTime.toString(),"");
+        if (null != startTime){
+            getBusinessDi().writeLog(getId(), m_Creator,"修改开始时间为", startTime.toString(),"");
+        }
         markPersistenceUpdate();
     }
 
     @Override
     public void setEndTime(Date endTime) {
-        if (m_EndTime.toString() == endTime.toString()){
-            return;
-        }
         m_EndTime=endTime;
-        getBusinessDi().writeLog(getId(), m_Creator,"修改结束时间为", endTime.toString(),"");
-
+        if (null != endTime){
+            getBusinessDi().writeLog(getId(), m_Creator,"修改结束时间为", endTime.toString(),"");
+        }
         markPersistenceUpdate();
     }
 
@@ -290,30 +286,35 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     @Override
     public void LevelHighest() {
         m_Level= OPTION_LEVEL_HIGHEST.id;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改优先级为", OPTION_LEVEL_HIGHEST.name,"");
         markPersistenceUpdate();
     }
 
     @Override
     public void LevelHigh() {
         m_Level= OPTION_LEVEL_HIGH.id;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改优先级为", OPTION_LEVEL_HIGH.name,"");
         markPersistenceUpdate();
     }
 
     @Override
     public void LevelMiddle() {
         m_Level= OPTION_LEVEL_MIDDLE.id;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改优先级为", OPTION_LEVEL_MIDDLE.name,"");
         markPersistenceUpdate();
     }
 
     @Override
     public void LevelLow() {
         m_Level= OPTION_LEVEL_LOW.id;
+        getBusinessDi().writeLog(getId(), m_Creator,"修改优先级为", OPTION_LEVEL_LOW.name,"");
         markPersistenceUpdate();
     }
 
     @Override
     public void delete() {
         m_IsDelete = STATE_DELETE.id;
+        getBusinessDi().writeLog(getId(), m_Creator,"删除了任务", this.getTitle(),"");
         markPersistenceUpdate();
     }
 
@@ -326,8 +327,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         }
     }
 
+    /**
+     * 扭转为评估中
+     * @throws ApiException
+     */
     @Override
-    public void turnEstimate() throws ApiException {
+    public synchronized void turnEstimate() throws ApiException {
         NameItem state = getState();
         if (STATE_ESTIMATE.id == state.id){
             return;
@@ -341,8 +346,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为规划中
+     * @throws ApiException
+     */
     @Override
-    public void turnPlanning() throws ApiException {
+    public synchronized void turnPlanning() throws ApiException {
         NameItem state = getState();
         if (STATE_PLAN.id == state.id){
             return;
@@ -356,8 +365,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为等待开发
+     * @throws ApiException
+     */
     @Override
-    public void turnWaitingDevelop() throws ApiException {
+    public synchronized void turnWaitingDevelop() throws ApiException {
         NameItem state = getState();
         if (STATE_WAIT_DEVELOP.id == state.id){
             return;
@@ -372,8 +385,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为开发中
+     * @throws ApiException
+     */
     @Override
-    public void turnDevelop() throws ApiException {
+    public synchronized void turnDevelop() throws ApiException {
         NameItem state = getState();
         if (STATE_DEVELOP.id == state.id){
             return;
@@ -390,8 +407,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为待测试
+     * @throws ApiException
+     */
     @Override
-    public void turnWaitingTest() throws ApiException {
+    public synchronized void turnWaitingTest() throws ApiException {
         NameItem state = getState();
         if (STATE_WAIT_TEST.id == state.id){
             return;
@@ -406,8 +427,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为测试中
+     * @throws ApiException
+     */
     @Override
-    public void turnTesting() throws ApiException {
+    public synchronized void turnTesting() throws ApiException {
         NameItem state = getState();
         if (STATE_TEST.id == state.id){
             return;
@@ -421,8 +446,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为测试通过
+     * @throws ApiException
+     */
     @Override
-    public void turnPassTest() throws ApiException {
+    public synchronized void turnPassTest() throws ApiException {
         NameItem state = getState();
         if (STATE_PASS_TEST.id == state.id){
             return;
@@ -437,8 +466,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为已上线
+     * @throws ApiException
+     */
     @Override
-    public void turnOnLine() throws ApiException {
+    public synchronized void turnOnLine() throws ApiException {
         NameItem state = getState();
         if (STATE_ONLINE.id == state.id){
             return;
@@ -452,8 +485,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为拒绝
+     * @throws ApiException
+     */
     @Override
-    public void turnReject() throws ApiException {
+    public synchronized void turnReject() throws ApiException {
         NameItem state = getState();
         if (STATE_REJECT.id == state.id){
             return;
@@ -475,8 +512,12 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
+    /**
+     * 扭转为挂起
+     * @throws ApiException
+     */
     @Override
-    public void turnPending() throws ApiException {
+    public synchronized void turnPending() throws ApiException {
         NameItem state = getState();
         if (STATE_PENDING.id == state.id){
             return;
@@ -496,26 +537,42 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         markPersistenceUpdate();
     }
 
-
+    /**
+     * 调用Di获取当前任务的总缺陷数量
+     * @return
+     */
     public int getBugsCount(){
         return getBusinessDi().getBugsCount(getId().getOrdinal());
     }
+    /**
+     * 调用Di获取当前任务缺陷的各处理人的处理总数
+     * @return
+     */
     public int getBugsFinishCount(){
         return getBusinessDi().getBugsFinishCount(getId().getOrdinal());
     }
-
+    /**
+     * 调用Di获取当前任务的缺陷分析
+     * @return
+     */
     @Override
     public Map<String, Integer> getStateAnalysis() {
         return getBusinessDi().getStateAnalysis(getId().getOrdinal());
     }
 
-
-
+    /**
+     * 调用Di获取当前任务缺陷各测人的缺陷总量
+     * @return
+     */
     @Override
     public Map<String, Integer> getTesterAndCount() {
         return getBusinessDi().getTesterAndCount(getId().getOrdinal());
     }
 
+    /**
+     * 调用Di获取当前任务缺陷的各处理人的处理总数
+     * @return
+     */
     @Override
     public Map<String, Integer> getHandlerAndCount() {
         return getBusinessDi().getHandlerAndCount(getId().getOrdinal());

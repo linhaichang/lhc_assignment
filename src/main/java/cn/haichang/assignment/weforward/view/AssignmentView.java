@@ -97,33 +97,12 @@ public class AssignmentView {
     }
 
     @DocAttribute(description = "优先级")
-    public String  getLevel(){
+    public String getLevel(){
         return m_Assignment.getLevel().getName();
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @DocAttribute(description = "缺陷简况")
+    public String getBugProfile(){
+        return m_Assignment.getBugsFinishCount()+" / "+m_Assignment.getBugsCount();
+    }
 }
