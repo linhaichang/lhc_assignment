@@ -40,7 +40,7 @@ public class AssignmentParam {
     public void setContent(String m_Content) {
         this.m_Content = m_Content;
     }
-    @DocAttribute(necessary = true,description = "处理人",example = "小王")
+    @DocAttribute(description = "处理人",example = "小王")
     public List<String> getHandlers() {
         return m_Handlers;
     }
@@ -49,7 +49,7 @@ public class AssignmentParam {
         this.m_Handlers = m_Handlers;
     }
 
-    @DocAttribute(necessary = true,description = "负责人",example = "小聪")
+    @DocAttribute(description = "负责人",example = "小聪")
     public String getCharger() {
         return m_Charger;
     }
@@ -57,7 +57,7 @@ public class AssignmentParam {
     public void setCharger(String m_Charger) {
         this.m_Charger = m_Charger;
     }
-    @DocAttribute(necessary = true,description = "标签",example = "内务大厅")
+    @DocAttribute(necessary = true,description = "标签id，必须先有标签")
     public String getLableId() {
         return m_LableId;
     }

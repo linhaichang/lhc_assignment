@@ -64,7 +64,7 @@ public interface AssignmentService {
      * @param id
      * @throws MyException
      */
-    void deleteaAssignment(String id) throws MyException;
+    void deleteAssignment(String id) throws MyException;
 
     /**
      * 创建标签

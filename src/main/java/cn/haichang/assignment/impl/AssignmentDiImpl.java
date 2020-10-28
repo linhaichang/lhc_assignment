@@ -100,6 +100,7 @@ public class AssignmentDiImpl implements AssignmentDi {
         ResultPage<BugImpl> rp = m_PsBug.startsWith(assignmentId);
         ArrayList<String > list = new ArrayList<>();
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
+            //将所有状态存放再list
             NameItem nameItem = Bug.STATES_BUGS.get(bug.getState().id);
             String stateName = nameItem.name;
             list.add(stateName);
@@ -151,7 +152,7 @@ public class AssignmentDiImpl implements AssignmentDi {
     private static Map<String,Integer> statistics(List<String > list){
         HashMap<String , Integer> map = new HashMap<>();
         for (int i = 0; i < list.size(); i++) {
-            //如果map中有这个key，则将这个key映射的value数值+1，再覆盖原键值对
+            //如果map中有这个key，则将这个key的value数值+1，再覆盖原键值对
             if (map.get(list.get(i))!=null){
                 map.put(list.get(i),map.get(list.get(i))+1);
             }else {

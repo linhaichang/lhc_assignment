@@ -85,12 +85,10 @@ public class AssignmentMethods implements ExceptionHandler {
         ValidateUtil.isEmpty(title, "标题不能为空");
         ValidateUtil.isEmpty(content, "内容不能为空");
         ValidateUtil.isEmpty(lableId, "标签不能为空");
-        ValidateUtil.isEmpty(startTime, "预计开始时间不能为空");
-        ValidateUtil.isEmpty(endTime, "预计结束时间能为空");
         ValidateUtil.isEmpty(fatherId, "父Id不能为空");
         m_AssignmentService.getAssignment(fatherId);
         Assignment assignment = m_AssignmentService.createAssignmentSon(title
-                , content, /*getCreator(),*/ handlers, charger, lableId, startTime
+                , content, handlers, charger, lableId, startTime
                 ,endTime,level,fatherId);
         return AssignmentView.valueOf(assignment);
     }
@@ -289,7 +287,7 @@ public class AssignmentMethods implements ExceptionHandler {
     @DocParameter(@DocAttribute(name = "assignmentId", type = String.class,necessary = true, description = "待删除的任务Id"))
     @DocMethod(description = "删除任务", index = 11)
     public String delete(FriendlyObject params) throws MyException {
-        m_AssignmentService.deleteaAssignment(params.getString("assignmentId"));
+        m_AssignmentService.deleteAssignment(params.getString("assignmentId"));
         return "删除成功";
     }
 

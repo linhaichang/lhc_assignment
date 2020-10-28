@@ -129,6 +129,11 @@ public interface Assignment {
     Date getFinishTime();
     NameItem getLevel();
     NameItem getState();
+
+    /**
+     * 获取父任务id
+     * @return
+     */
     String getFatherId();
 
     /* 设置优先级*/

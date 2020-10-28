@@ -7,6 +7,7 @@ import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
 import cn.weforward.data.log.BusinessLoggerFactory;
 import cn.weforward.data.persister.PersisterFactory;
+import cn.weforward.data.search.Searcher;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,7 +44,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
                                           Set<String> handlers, String charger,
                                           String lableId, Date startTime,
                                           Date endTime, int level, String fatherId) throws MyException {
-        //校验任务是否存在
+        //校验父任务是否存在
         String realId = getAssignment(fatherId).getId().getOrdinal();
         return new AssignmentImpl(this, title, content, handlers, charger
         , lableId, startTime, endTime, level,realId);
@@ -81,7 +82,6 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
             if (isMatch(assignment, personName, personType)){
                 if (isMatch(assignment, assignmentState)){
                     assignmentList.add(assignment);
-                    continue;
                 }
             }
         }
@@ -115,7 +115,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      * @throws MyException
      */
     @Override
-    public void deleteaAssignment(String id) throws MyException {
+    public void deleteAssignment(String id) throws MyException {
         if (null == m_PsAssignment.get(id)){
             throw new MyException("找不到此任务，无法删除");
         }
@@ -320,27 +320,34 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      */
     @Override
     public ResultPage<Bug> searchBugs(String assignmentId, String tester, String handler, int state) throws MyException {
+        //获取某任务下的所有缺陷
         ResultPage<Bug> rp = getBugByAssignmentId(assignmentId);
         List<Bug> list = new CopyOnWriteArrayList<>();
             for (Bug bug : ResultPageHelper.toForeach(rp)){
                     list.add(bug);
             }
+            //如果输入的参数测试人不为空
             if (null != tester && !"".equals(tester)){
                 for (Bug bug : list) {
+                    //则移除所有不含 “参数测试人” 的缺陷
                     if (!bug.getTesters().contains(tester)){
                         list.remove(bug);
                     }
                 }
             }
+            //如果输入的参数处理人不为空
             if (null != handler && !"".equals(handler)){
                 for (Bug bug : list) {
+                    //则移除所有不含 “参数处理人” 的缺陷
                     if (!bug.getTestHandlers().contains(handler)){
                         list.remove(bug);
                     }
                 }
             }
+            //如果输入的 状态参数 不为空
             if (0 != state){
                 for (Bug bug : list){
+                    //则移除所有不等于 “状态参数” 的缺陷
                     if (bug.getState().id != state){
                         list.remove(bug);
                     }
