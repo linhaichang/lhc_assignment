@@ -39,10 +39,19 @@ public class AssignmentDiImpl implements AssignmentDi {
         m_BusinessLogger=loggerFactory.createLogger("lhc_logger");
     }
 
+    /**
+     * 通过标签的ID获取所有此标签下的所有任务
+     * @param lableId
+     * @return
+     */
     @Override
     public ResultPage<AssignmentImpl> searchAssignmentByLableId(String lableId) {
         ResultPage<AssignmentImpl> assignments = m_PsAssignment.search(
-                ConditionUtil.eq(ConditionUtil.field("lableId"), lableId)
+        //标签id相符且任务未删除
+                ConditionUtil.and(
+                        ConditionUtil.eq(ConditionUtil.field("lableId"), lableId),
+                        ConditionUtil.ne(ConditionUtil.field("isDelete"), Assignment.STATE_DELETE.id)
+                        )
         );
         return assignments;
     }
@@ -89,17 +98,13 @@ public class AssignmentDiImpl implements AssignmentDi {
     @Override
     public Map<String, Integer> getStateAnalysis(String assignmentId) {
         ResultPage<BugImpl> rp = m_PsBug.startsWith(assignmentId);
-        Map<String ,Integer> map = new HashMap<>(Bug.STATES_BUGS.size());
-        //首先遍历出缺陷的状态
+        ArrayList<String > list = new ArrayList<>();
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
             NameItem nameItem = Bug.STATES_BUGS.get(bug.getState().id);
             String stateName = nameItem.name;
-            //如果map中没有该状态，则该状态数量为0。如有该状态，则该状态为map的key
-            Integer count = null == map.get(stateName) ? 0 : map.get(stateName);
-            //数量+1
-            map.put(stateName,++count);
+            list.add(stateName);
         }
-        return map;
+        return statistics(list);
     }
 
     /**
@@ -146,9 +151,11 @@ public class AssignmentDiImpl implements AssignmentDi {
     private static Map<String,Integer> statistics(List<String > list){
         HashMap<String , Integer> map = new HashMap<>();
         for (int i = 0; i < list.size(); i++) {
+            //如果map中有这个key，则将这个key映射的value数值+1，再覆盖原键值对
             if (map.get(list.get(i))!=null){
                 map.put(list.get(i),map.get(list.get(i))+1);
             }else {
+                //如果map中没有这个key，则value = 1
                 map.put(list.get(i),1);
             }
         }

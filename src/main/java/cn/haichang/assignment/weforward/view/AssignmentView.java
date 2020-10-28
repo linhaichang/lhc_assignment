@@ -66,12 +66,12 @@ public class AssignmentView {
         return m_Assignment.getLable();
     }
 
-    @DocAttribute(description = "任务开始时间")
+    @DocAttribute(description = "任务预计开始时间")
     public Date getStartTime() {
         return m_Assignment.getStartTime();
     }
 
-    @DocAttribute(description = "任务结束时间")
+    @DocAttribute(description = "任务预计结束时间")
     public Date getEndTime() {
         return m_Assignment.getEndTime();
     }

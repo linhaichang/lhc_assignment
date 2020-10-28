@@ -34,13 +34,10 @@ public class BugView {
     public String getState(){
         return m_Bug.getState().getName();
     }
-    @DocAttribute(description = "Bug严重性")
-    public int getSeverity(){
-        return m_Bug.getSeverity();
-    }
+
     @DocAttribute(description = "Bug严重性描述")
-    public String  getSeverityDesc(){
-        return Bug.SEVERITY.get(m_Bug.getSeverity()).name;
+    public String getSeverityDesc(){
+        return m_Bug.getSeverity();
     }
     @DocAttribute(description = "测试人")
     public Set<String > getTesters(){

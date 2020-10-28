@@ -4,7 +4,7 @@ import cn.haichang.assignment.Bug;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.NameItems;
 import cn.weforward.common.ResultPage;
-import cn.weforward.framework.ApiException;
+
 
 import java.util.Date;
 import java.util.Set;
@@ -34,14 +34,14 @@ public interface AssignmentService {
      */
     Assignment createAssignmentSon(String title, String content,/*String creator,*/ Set<String> handlers,
                                    String charger, String lableId, Date startTime,
-                                   Date endTime,int level,String fatherId);
+                                   Date endTime,int level,String fatherId) throws MyException;
 
     /**
      * 根据id获取任务
      * @param id
      * @return
      */
-    Assignment getAssignment(String id) throws ApiException;
+    Assignment getAssignment(String id) throws MyException;
 
     /**
      * 通过 人名，人的类型(负责人，处理人，跟进人),任务是否完成条件 获取任务
@@ -62,9 +62,9 @@ public interface AssignmentService {
     /**
      * 根据id删除任务
      * @param id
-     * @throws ApiException
+     * @throws MyException
      */
-    void deleteaAssignment(String id) throws ApiException;
+    void deleteaAssignment(String id) throws MyException;
 
     /**
      * 创建标签
@@ -78,7 +78,7 @@ public interface AssignmentService {
      * @param lableId
      * @return
      */
-    Lable getLable(String lableId);
+    Lable getLable(String lableId) throws MyException;
 
     /**
      * 获取所有标签
@@ -111,32 +111,35 @@ public interface AssignmentService {
      * @param assignmentId
      * @param bugContent
      * @param severity
-     * @param tester
+     * @param handlers
      * @param versionAndPlatform
      * @return
      */
     Bug createBug(String assignmentId,
-                  String bugContent, int severity,
-                  Set<String> tester, String versionAndPlatform);
+                  String bugContent, String severity,
+                  Set<String> handlers, String versionAndPlatform);
 
     /**
      * 根据任务Id获取缺陷
      * @param AssignmentId
      * @return
      */
-    ResultPage<Bug> getBugByAssignmentId(String AssignmentId);
+    ResultPage<Bug> getBugByAssignmentId(String AssignmentId) throws MyException;
 
     /**
      * 根据缺陷id 获取缺陷
      * @param id
      * @return
      */
-    Bug getBug(String id);
+    Bug getBug(String id) throws MyException;
 
     /**
      * 通过关键字搜索缺陷内容，获取缺陷
+     *
+     * @param assignmentId
      * @param keywords
      * @return
      */
-    ResultPage<Bug> getBugByKeyWord(String keywords);
+    ResultPage<Bug> getBugByKeyWord(String assignmentId,String keywords) throws MyException;
+    ResultPage<Bug> searchBugs(String assignmentId,String tester,String handler,int state) throws MyException;
 }

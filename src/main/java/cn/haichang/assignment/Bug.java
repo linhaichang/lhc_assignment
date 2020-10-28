@@ -27,13 +27,6 @@ public interface Bug {
     NameItems STATES_BUGS = NameItems.valueOf(STATE_WAIT_CORRECT,STATE_WAIT_RETEST,STATE_ADVISE_DONT_EDIT,
             STATE_ASK_CANT_EDIT,STATE_SOLVED,STATE_NO_EDIT,STATE_CANT_SOLVE,STATE_REOPEN);
 
-    NameItem OPTION_SEVERITY_ERROR = NameItem.valueOf("功能错误", 31);
-    NameItem OPTION_SEVERITY_EFFECT = NameItem.valueOf("影响流程", 32);
-    NameItem OPTION_SEVERITY_NEWASSIGNMENT = NameItem.valueOf("新需求", 33);
-    NameItem OPTION_SEVERITY_ADVISE = NameItem.valueOf("优化建议", 34);
-    /** 全部严重性*/
-    NameItems SEVERITY =NameItems.valueOf(OPTION_SEVERITY_ERROR,OPTION_SEVERITY_EFFECT,OPTION_SEVERITY_NEWASSIGNMENT,OPTION_SEVERITY_ADVISE);
-
     NameItem STATE_DELETE = NameItem.valueOf("删除", 28);
 
     /**
@@ -48,14 +41,14 @@ public interface Bug {
     String getBugContent();
     void setBugContent(String content);
 
-    int getSeverity();
-    void setSeverity(int severity);
+    String getSeverity();
+    void setSeverity(String severity);
 
     Set<String> getTesters();
     void setTesters(Set<String> tester);
 
     Set<String> getTestHandlers();
-    void addTestHandler(Set<String> testHandlers);
+    void setTestHandler(Set<String> testHandlers);
 
     NameItem getState();
 

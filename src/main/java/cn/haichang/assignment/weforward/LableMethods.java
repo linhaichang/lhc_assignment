@@ -3,6 +3,7 @@ package cn.haichang.assignment.weforward;
 import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.AssignmentService;
 import cn.haichang.assignment.Lable;
+import cn.haichang.assignment.MyException;
 import cn.haichang.assignment.impl.AssignmentImpl;
 import cn.haichang.assignment.weforward.param.LableParam;
 import cn.haichang.assignment.weforward.param.UpdateAssignmentParam;
@@ -12,10 +13,7 @@ import cn.haichang.assignment.weforward.view.SimpleLableView;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
 import cn.weforward.common.util.TransResultPage;
-import cn.weforward.framework.ApiException;
-import cn.weforward.framework.KeepServiceOrigin;
-import cn.weforward.framework.WeforwardMethod;
-import cn.weforward.framework.WeforwardMethods;
+import cn.weforward.framework.*;
 import cn.weforward.framework.doc.DocMethods;
 import cn.weforward.framework.util.ValidateUtil;
 import cn.weforward.protocol.client.util.IdBean;
@@ -34,7 +32,7 @@ import java.util.List;
  **/
 @DocMethods(index = 200)
 @WeforwardMethods
-public class LableMethods {
+public class LableMethods implements ExceptionHandler {
     @Resource
     protected AssignmentService m_AssignmentService;
 
@@ -52,7 +50,7 @@ public class LableMethods {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "LableId", type = String.class, necessary = true, description = "标签id"))
     @DocMethod(description = "获取标签", index = 1)
-    public LableView get(FriendlyObject params) throws ApiException {
+    public LableView get(FriendlyObject params) throws ApiException, MyException {
         String lableId = params.getString("LableId");
         ValidateUtil.isEmpty(lableId,"标签Id不能为空");
         return LableView.valueOf(m_AssignmentService.getLable(lableId));
@@ -62,12 +60,9 @@ public class LableMethods {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "LableId", type = String.class,necessary = true, description = "标签Id"))
     @DocMethod(description = "删除标签", index = 4)
-    public String delete(FriendlyObject params) throws ApiException {
+    public String delete(FriendlyObject params) throws ApiException, MyException {
         String lableId = params.getString("LableId");
         ValidateUtil.isEmpty(lableId,"标签Id不能为空");
-        if (null == m_AssignmentService.getLable(lableId)){
-            throw new ApiException(0,"无此标签");
-        }
         Lable lable = m_AssignmentService.getLable(params.getString("LableId"));
         /**
          * 判断此标签的任务数是否=0
@@ -76,7 +71,7 @@ public class LableMethods {
         if (lable.getAssignments().getCount() == 0 ){
             m_AssignmentService.deleteLable(params.getString("LableId"));
         }else {
-            throw new ApiException(123, "此标签下还有"+i+"条任务，不能删除");
+            throw new MyException( "此标签下还有"+i+"条任务，不能删除");
         }
         return "成功删除标签";
     }
@@ -96,16 +91,21 @@ public class LableMethods {
     @KeepServiceOrigin
     @WeforwardMethod
     @DocMethod(description = "修改标签名", index = 3)
-    public String update(UpdateLableParam params) throws ApiException {
+    public String update(UpdateLableParam params) throws ApiException, MyException {
         String lableId = params.getLableId();
         String lableName = params.getLableName();
         ValidateUtil.isEmpty(lableId, "标签id不能为空");
         ValidateUtil.isEmpty(lableName, "标签名不能为空");
         Lable lable = m_AssignmentService.getLable(lableId);
-        if (null == lable){
-            return "无此标签";
-        }
         lable.setLableName(lableName);
         return "成功修改标签";
+    }
+
+    @Override
+    public Throwable exception(Throwable error) {
+        if (error instanceof MyException){
+            return new ApiException(AssignmentServiceCode.getCode((MyException) error), error.getMessage());
+        }
+        return error;
     }
 }

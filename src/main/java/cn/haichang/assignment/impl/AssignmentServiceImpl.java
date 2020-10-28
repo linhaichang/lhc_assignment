@@ -1,21 +1,18 @@
 package cn.haichang.assignment.impl;
 
-import cn.haichang.assignment.Assignment;
-import cn.haichang.assignment.AssignmentService;
-import cn.haichang.assignment.Bug;
-import cn.haichang.assignment.Lable;
+import cn.haichang.assignment.*;
 
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
 import cn.weforward.data.log.BusinessLoggerFactory;
 import cn.weforward.data.persister.PersisterFactory;
-import cn.weforward.framework.ApiException;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author HaiChang
@@ -31,8 +28,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      * @return
      */
     @Override
-    public Assignment createAssignment(String title, String content,
-                                       /*String creator,*/ Set<String> handlers,
+    public Assignment createAssignment(String title, String content, Set<String> handlers,
                                        String charger, String lableId, Date startTime,
                                        Date endTime, int level) {
         return new AssignmentImpl(this, title, content, handlers, charger, lableId, startTime, endTime, level);
@@ -43,12 +39,14 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      * @return
      */
     @Override
-    public Assignment createAssignmentSon(String title, String content, /*String creator,*/
+    public Assignment createAssignmentSon(String title, String content,
                                           Set<String> handlers, String charger,
                                           String lableId, Date startTime,
-                                          Date endTime, int level, String fatherId) {
+                                          Date endTime, int level, String fatherId) throws MyException {
+        //校验任务是否存在
+        String realId = getAssignment(fatherId).getId().getOrdinal();
         return new AssignmentImpl(this, title, content, handlers, charger
-        , lableId, startTime, endTime, level,fatherId);
+        , lableId, startTime, endTime, level,realId);
     }
 
     /**
@@ -57,13 +55,13 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      * @return
      */
     @Override
-    public Assignment getAssignment(String id) throws ApiException {
+    public Assignment getAssignment(String id) throws MyException {
         AssignmentImpl assignment = m_PsAssignment.get(id);
         if (null == assignment){
-            throw new ApiException(0, "查询不到此任务");
+            throw new MyException( "查询不到此任务");
         }
         if (assignment.isDelete()){
-            throw new ApiException(0, "查询不到此任务");
+            throw new MyException( "此任务已被删除");
         }
         return assignment;
     }
@@ -77,12 +75,9 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      */
     @Override
     public ResultPage<Assignment> searchAssignment(String personName,int personType,int assignmentState) {
-        ResultPage<? extends Assignment> resultPage = m_PsAssignment.startsWith("");
+        ResultPage<Assignment> rp = getAllAssignments();
         List<Assignment> assignmentList = new ArrayList<>();
-        for (Assignment assignment : ResultPageHelper.toForeach(resultPage)) {
-            if (assignment.isDelete()){
-                continue;
-            }
+        for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
             if (isMatch(assignment, personName, personType)){
                 if (isMatch(assignment, assignmentState)){
                     assignmentList.add(assignment);
@@ -117,12 +112,12 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     /**
      * 根据id删除任务
      * @param id
-     * @throws ApiException
+     * @throws MyException
      */
     @Override
-    public void deleteaAssignment(String id) throws ApiException {
+    public void deleteaAssignment(String id) throws MyException {
         if (null == m_PsAssignment.get(id)){
-            throw new ApiException(0, "无此任务");
+            throw new MyException("找不到此任务，无法删除");
         }
         AssignmentImpl assignment = m_PsAssignment.get(id);
         assignment.delete();
@@ -144,7 +139,10 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      * @return
      */
     @Override
-    public Lable getLable(String lableId) {
+    public Lable getLable(String lableId) throws MyException {
+        if (null == m_PsLable.get(lableId)){
+            throw new MyException("无此标签");
+        }
         return m_PsLable.get(lableId);
     }
 
@@ -168,9 +166,10 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
      */
     @Override
     public ResultPage<Assignment> getByKeyWord(String keyword) {
-        ResultPage<? extends Assignment> rp = m_PsAssignment.startsWith("");
+        ResultPage<Assignment> rp = getAllAssignments();
         List<Assignment> list = new ArrayList<>();
         for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
+
             if (assignment.getTitle().contains(keyword) && !assignment.isDelete())
             list.add(assignment);
         }
@@ -196,7 +195,12 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         ResultPage<? extends Assignment> rp = m_PsAssignment.startsWith("");
         List<Assignment> list = new ArrayList<>();
         for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
+            //排除已删除的
             if (assignment.isDelete()){
+                continue;
+            }
+            //排除子任务
+            if (null != assignment.getFatherId()){
                 continue;
             }
             list.add(assignment);
@@ -256,15 +260,22 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     /*------------------------------------------BUG相关-------------------------------------------------*/
 
     public Bug createBug(String assignmentId,
-                         String bugContent,int severity,
-                         Set<String> tester,String versionAndPlatform){
+                         String bugContent, String severity,
+                         Set<String> handlers, String versionAndPlatform){
         return new BugImpl(this,assignmentId,bugContent,severity
-        ,tester,versionAndPlatform);
+        ,handlers,versionAndPlatform);
     }
 
+    /**
+     * 通过任务Id，获取该任务下的所有缺陷
+     * @param fatherId
+     * @return
+     * @throws MyException
+     */
     @Override
-    public ResultPage<Bug> getBugByAssignmentId(String fatherId) {
-        ResultPage<? extends Bug> rp = m_PsBug.startsWith(fatherId);
+    public ResultPage<Bug> getBugByAssignmentId(String fatherId) throws MyException {
+        String assignmentId = getAssignment(fatherId).getId().getOrdinal();
+        ResultPage<? extends Bug> rp = m_PsBug.startsWith(assignmentId);
         List<Bug> list = new ArrayList<>();
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
             list.add(bug);
@@ -273,18 +284,68 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
     }
 
     @Override
-    public Bug getBug(String id) {
+    public Bug getBug(String id) throws MyException {
+        if (null == m_PsBug.get(id)){
+            throw new MyException("缺陷不存在");
+        }
         return m_PsBug.get(id);
     }
 
+    /**
+     * 通过关键字搜索缺陷
+     * @param assignmentId
+     * @param keywords
+     * @return
+     * @throws MyException
+     */
     @Override
-    public ResultPage<Bug> getBugByKeyWord(String keywords) {
-        ResultPage<? extends Bug> rp = m_PsBug.startsWith("");
+    public ResultPage<Bug> getBugByKeyWord(String assignmentId, String keywords) throws MyException {
+        ResultPage<Bug> rp = getBugByAssignmentId(assignmentId);
         List<Bug> list = new ArrayList<>();
         for (Bug bug : ResultPageHelper.toForeach(rp)) {
             if (bug.getBugContent().contains(keywords))
                 list.add(bug);
         }
+        return ResultPageHelper.toResultPage(list);
+    }
+
+    /**
+     * 条件查询缺陷
+     * @param assignmentId 任务id
+     * @param tester 条件：测试人
+     * @param handler 条件：处理人
+     * @param state 条件 状态
+     * @return
+     * @throws MyException
+     */
+    @Override
+    public ResultPage<Bug> searchBugs(String assignmentId, String tester, String handler, int state) throws MyException {
+        ResultPage<Bug> rp = getBugByAssignmentId(assignmentId);
+        List<Bug> list = new CopyOnWriteArrayList<>();
+            for (Bug bug : ResultPageHelper.toForeach(rp)){
+                    list.add(bug);
+            }
+            if (null != tester && !"".equals(tester)){
+                for (Bug bug : list) {
+                    if (!bug.getTesters().contains(tester)){
+                        list.remove(bug);
+                    }
+                }
+            }
+            if (null != handler && !"".equals(handler)){
+                for (Bug bug : list) {
+                    if (!bug.getTestHandlers().contains(handler)){
+                        list.remove(bug);
+                    }
+                }
+            }
+            if (0 != state){
+                for (Bug bug : list){
+                    if (bug.getState().id != state){
+                        list.remove(bug);
+                    }
+                }
+            }
         return ResultPageHelper.toResultPage(list);
     }
 }

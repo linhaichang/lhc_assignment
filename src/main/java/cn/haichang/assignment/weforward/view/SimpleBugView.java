@@ -24,7 +24,10 @@ public class SimpleBugView {
         this.m_Bug = m_Bug;
     }
 
-
+    @DocAttribute(description = "缺陷id")
+    public String getId(){
+        return m_Bug.getId().getOrdinal();
+    }
     @DocAttribute(description = "Bug内容")
     public String getBugContent(){
         return m_Bug.getBugContent();
@@ -33,9 +36,9 @@ public class SimpleBugView {
     public String getState(){
         return m_Bug.getState().getName();
     }
-    @DocAttribute(description = "Bug严重性描述")
+    @DocAttribute(description = "Bug严重性")
     public String  getSeverityDesc(){
-        return Bug.SEVERITY.get(m_Bug.getSeverity()).name;
+        return m_Bug.getSeverity();
     }
     @DocAttribute(description = "测试人")
     public Set<String > getTesters(){

@@ -14,7 +14,7 @@ public class BugParam {
     protected String m_AssignmentId;
 
     protected String m_BugContent;
-    protected int m_Severity;
+    protected String m_Severity;
     protected List<String > m_Testers;
     protected String m_VersionAndPlatform;
     protected List<String > m_TestHandlers;
@@ -35,12 +35,12 @@ public class BugParam {
         this.m_BugContent = BugContent;
     }
 
-    @DocAttribute(description = "测试人员", example = "小马")
-    public List<String> getTesters() {
-        return m_Testers;
+    @DocAttribute(description = "处理人员", example = "小马")
+    public List<String> getHandlers() {
+        return m_TestHandlers;
     }
-    public void setTesters(List<String> Testers) {
-        this.m_Testers = Testers;
+    public void setHandlers(List<String> handlers) {
+        this.m_TestHandlers = handlers;
     }
 
     @DocAttribute(necessary = true, description = "版本与平台", example = "商家后台")
@@ -51,11 +51,11 @@ public class BugParam {
         this.m_VersionAndPlatform = VersionAndPlatform;
     }
 
-    @DocAttribute(necessary = true, description = "严重性", example = "32")
-    public int getSeverity() {
+    @DocAttribute(necessary = true, description = "严重性", example = "优化建议")
+    public String  getSeverity() {
         return m_Severity;
     }
-    public void setSeverity(int Severity) {
+    public void setSeverity(String Severity) {
         this.m_Severity = Severity;
     }
 

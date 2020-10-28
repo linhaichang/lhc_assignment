@@ -24,6 +24,10 @@ public class SimpleAssignmentView {
         this.m_Assignment = assignment;
     }
 
+    @DocAttribute(description = "任务id")
+    public String getId(){
+        return m_Assignment.getId().getOrdinal();
+    }
 
     @DocAttribute(description = "任务标题")
     public String getTitle(){
@@ -37,9 +41,12 @@ public class SimpleAssignmentView {
     }
 
 
-    @DocAttribute(description = "任务创建时间")
-    public Date getCreateTime() {
-        return m_Assignment.getCreateTime();
+    @DocAttribute(description = "任务上线/拒绝时间")
+    public Date getOnlineOrRejectTime() {
+        if (null == m_Assignment.getFinishTime()){
+            return m_Assignment.getStartTime();
+        }
+        return m_Assignment.getFinishTime();
     }
 
 

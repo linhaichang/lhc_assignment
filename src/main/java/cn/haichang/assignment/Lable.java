@@ -25,5 +25,5 @@ public interface Lable {
      * 获取标签下的所有任务
      * @return
      */
-    ResultPage<AssignmentImpl> getAssignments();
+    ResultPage<AssignmentImpl> getAssignments() throws MyException;
 }

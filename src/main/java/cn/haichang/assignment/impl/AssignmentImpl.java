@@ -1,6 +1,7 @@
 package cn.haichang.assignment.impl;
 
 import cn.haichang.assignment.Assignment;
+import cn.haichang.assignment.MyException;
 import cn.haichang.assignment.di.AssignmentDi;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
@@ -11,6 +12,7 @@ import cn.weforward.data.log.BusinessLog;
 import cn.weforward.data.persister.support.AbstractPersistent;
 import cn.weforward.framework.ApiException;
 import cn.weforward.framework.support.Global;
+import cn.weforward.framework.util.ValidateUtil;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -79,6 +81,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_CreateTime=new Date();
         m_FatherID=null;
         m_IsDelete = 0;
+        m_FinishTime = null;
         getBusinessDi().writeLog(getId(), m_Creator,"创建", "新任务", "");
         markPersistenceUpdate();
     }
@@ -107,6 +110,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_CreateTime=new Date();
         m_FatherID = fatherId;
         m_IsDelete = 0;
+        m_FinishTime = null;
         getBusinessDi().writeLog(getId(), m_Creator,"创建", "新子任务", "");
         markPersistenceUpdate();
     }
@@ -152,9 +156,9 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     }
 
     @Override
-    public void removeHandler(String handler) throws ApiException {
+    public void removeHandler(String handler) throws MyException {
         if (!m_Handlers.contains(handler)){
-            throw new ApiException(0,"没有此人");
+            throw new MyException("没有此人");
         }
         m_Handlers.remove(handler);
         getBusinessDi().writeLog(getId(), m_Creator,"移除处理人", handler, "");
@@ -190,15 +194,17 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         m_LableId=lableId;
-        getBusinessDi().writeLog(getId(), m_Creator,"修改标签", "","");
+        getBusinessDi().writeLog(getId(), m_Creator,"修改标签为", m_LableId,"");
         markPersistenceUpdate();
     }
 
     @Override
     public void setStartTime(Date startTime) {
         m_StartTime=startTime;
-        if (null != startTime){
-            getBusinessDi().writeLog(getId(), m_Creator,"修改开始时间为", startTime.toString(),"");
+        if (null == startTime){
+            getBusinessDi().writeLog(getId(), m_Creator,"清空", "预计开始时间","");
+        }else {
+            getBusinessDi().writeLog(getId(), m_Creator,"修改预计开始时间为", startTime.toString(),"");
         }
         markPersistenceUpdate();
     }
@@ -206,8 +212,10 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
     @Override
     public void setEndTime(Date endTime) {
         m_EndTime=endTime;
-        if (null != endTime){
-            getBusinessDi().writeLog(getId(), m_Creator,"修改结束时间为", endTime.toString(),"");
+        if (null == endTime){
+            getBusinessDi().writeLog(getId(), m_Creator,"清空", "预计结束时间","");
+        }else {
+            getBusinessDi().writeLog(getId(), m_Creator,"修改预计结束时间为", endTime.toString(),"");
         }
         markPersistenceUpdate();
     }
@@ -338,7 +346,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         if (STATE_PENDING.id != state.id ){
-            throw new ApiException(0, "非"+STATE_PENDING.getName()
+            throw new ApiException(10002, "非"+STATE_PENDING.getName()
             +"的状态，不能扭转为"+STATE_ESTIMATE.getName());
         }
         m_State = STATE_ESTIMATE.id;
@@ -357,7 +365,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         if (STATE_ESTIMATE.id != state.id ){
-            throw new ApiException(0, "非"+STATE_ESTIMATE.getName()
+            throw new ApiException(10002, "非"+STATE_ESTIMATE.getName()
                     +"的状态，不能扭转为"+STATE_PLAN.getName());
         }
         m_State = STATE_PLAN.id;
@@ -376,7 +384,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         if (STATE_PENDING.id != state.id && STATE_PLAN.id != state.id){
-            throw new ApiException(0, "非"+STATE_PENDING.getName()+"、"
+            throw new ApiException(10002, "非"+STATE_PENDING.getName()+"、"
                     +STATE_PLAN.getName()
                     +"的状态，不能扭转为"+STATE_WAIT_DEVELOP.getName());
         }
@@ -397,7 +405,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         }
         if (STATE_WAIT_DEVELOP.id != state.id && STATE_WAIT_TEST.id != state.id &&
         STATE_TEST.getName() != state.getName() && STATE_PASS_TEST.id != state.id){
-            throw new ApiException(0, "非"+STATE_WAIT_DEVELOP.getName()+"、"
+            throw new ApiException(10002, "非"+STATE_WAIT_DEVELOP.getName()+"、"
                     +STATE_WAIT_TEST.getName()+"、"+STATE_TEST.getName()+"、"
                     +STATE_PASS_TEST.getName()
                     +"的状态，不能扭转为"+STATE_DEVELOP.getName());
@@ -418,7 +426,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         if (STATE_DEVELOP.id != state.id && STATE_PENDING.id != state.id){
-            throw new ApiException(0, "非"+STATE_DEVELOP.getName()+"、"
+            throw new ApiException(10002, "非"+STATE_DEVELOP.getName()+"、"
                     +STATE_PENDING.getName()
                     +"的状态，不能扭转为"+STATE_WAIT_TEST.getName());
         }
@@ -438,7 +446,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         if (STATE_WAIT_TEST.id != state.id){
-            throw new ApiException(0, "非"+STATE_WAIT_TEST.getName()
+            throw new ApiException(10002, "非"+STATE_WAIT_TEST.getName()
                     +"的状态，不能扭转为"+STATE_TEST.getName());
         }
         m_State = STATE_TEST.id;
@@ -457,7 +465,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         if (STATE_TEST.id != state.id && STATE_PENDING.id != state.id){
-            throw new ApiException(0, "非"+STATE_TEST.getName()+"、"
+            throw new ApiException(10002, "非"+STATE_TEST.getName()+"、"
                     +STATE_PENDING.getName()
                     +"的状态，不能扭转为"+STATE_PASS_TEST.getName());
         }
@@ -477,10 +485,11 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
             return;
         }
         if (STATE_PASS_TEST.id != state.id){
-            throw new ApiException(0, "非"+STATE_PASS_TEST.getName()
+            throw new ApiException(10002, "非"+STATE_PASS_TEST.getName()
                     +"的状态，不能扭转为"+STATE_ONLINE.getName());
         }
         m_State = STATE_ONLINE.id;
+        m_FinishTime = new Date();
         getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_ONLINE.getName(), "");
         markPersistenceUpdate();
     }
@@ -499,7 +508,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         STATE_WAIT_DEVELOP.id != state.id && STATE_DEVELOP.id != state.id &&
         STATE_WAIT_TEST.id != state.id && STATE_TEST.id != state.id &&
         STATE_PASS_TEST.id != state.id && STATE_PENDING.id != state.id){
-            throw new ApiException(0, "非"
+            throw new ApiException(10002, "非"
                     +STATE_ESTIMATE.getName()+"、"
                     +STATE_PLAN.getName()+"、"+STATE_WAIT_DEVELOP.getName()+"、"
                     +STATE_DEVELOP.getName()+"、"+STATE_WAIT_TEST.getName()+"、"
@@ -508,6 +517,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                     +"的状态，不能扭转为"+STATE_REJECT.getName());
         }
         m_State = STATE_REJECT.id;
+        m_FinishTime = new Date();
         getBusinessDi().writeLog(getId(), getUser(),"状态扭转", "状态从"+STATES.get(this.m_State).getName()+"扭转为"+STATE_REJECT.getName(), "");
         markPersistenceUpdate();
     }
@@ -526,7 +536,7 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                 STATE_WAIT_DEVELOP.id != state.id && STATE_DEVELOP.id != state.id &&
                 STATE_WAIT_TEST.id != state.id && STATE_TEST.id != state.id &&
                 STATE_PASS_TEST.id != state.id ){
-            throw new ApiException(0, "非"
+            throw new ApiException(10002, "非"
                     +STATE_PLAN.getName()+"、"+STATE_WAIT_DEVELOP.getName()+"、"
                     +STATE_DEVELOP.getName()+"、"+STATE_WAIT_TEST.getName()+"、"
                     +STATE_TEST.getName()+"、"+STATE_PASS_TEST.getName()+"、"

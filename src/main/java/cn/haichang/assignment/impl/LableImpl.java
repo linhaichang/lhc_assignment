@@ -2,6 +2,7 @@ package cn.haichang.assignment.impl;
 
 import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.Lable;
+import cn.haichang.assignment.MyException;
 import cn.haichang.assignment.di.AssignmentDi;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.StringUtil;
@@ -53,8 +54,11 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
      * @return
      */
     @Override
-    public ResultPage<AssignmentImpl> getAssignments() {
+    public ResultPage<AssignmentImpl> getAssignments() throws MyException {
         ResultPage<AssignmentImpl> assignments = getBusinessDi().searchAssignmentByLableId(getId().getOrdinal());
+        if (null == assignments){
+            throw new MyException("此标签不存在");
+        }
         return assignments;
     }
 }

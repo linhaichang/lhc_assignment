@@ -12,7 +12,7 @@ import java.util.List;
 @DocObject(description = "更新缺陷参数")
 public class UpdateBugParam{
     protected String m_BugContent;
-    protected int m_Severity;
+    protected String  m_Severity;
     protected List<String > m_Testers;
     protected List<String > m_Handlers;
     protected String m_Id;
@@ -39,11 +39,11 @@ public class UpdateBugParam{
         this.m_BugContent = BugContent;
     }
 
-    @DocAttribute(necessary = true, description = "严重性", example = "32")
-    public int getSeverity() {
+    @DocAttribute(necessary = true, description = "严重性", example = "优化建议")
+    public String getSeverity() {
         return m_Severity;
     }
-    public void setSeverity(int Severity) {
+    public void setSeverity(String Severity) {
         this.m_Severity = Severity;
     }
 

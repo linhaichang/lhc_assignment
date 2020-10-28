@@ -31,7 +31,7 @@ public interface Assignment {
     /** 状态-测试通过*/
     NameItem STATE_PASS_TEST = NameItem.valueOf("测试通过", 6);
     /** 状态-以上线*/
-    NameItem STATE_ONLINE = NameItem.valueOf("以上线", 7);
+    NameItem STATE_ONLINE = NameItem.valueOf("已上线", 7);
     /** 状态-已拒绝*/
     NameItem STATE_REJECT = NameItem.valueOf("已拒绝", 8);
     /** 状态-挂起*/
@@ -83,7 +83,7 @@ public interface Assignment {
      * @param handler
      * @throws ApiException
      */
-    void removeHandler(String handler) throws ApiException;
+    void removeHandler(String handler) throws ApiException, MyException;
 
     /**
      * 增加跟进人

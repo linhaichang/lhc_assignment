@@ -22,6 +22,10 @@ public class SimpleSonAssignmentView {
         this.m_Assignment = assignment;
     }
 
+    @DocAttribute(description = "任务id")
+    public String getId(){
+        return m_Assignment.getId().getOrdinal();
+    }
 
     @DocAttribute(description = "任务标题")
     public String getTitle(){
