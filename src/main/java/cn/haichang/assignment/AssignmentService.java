@@ -21,13 +21,13 @@ public interface AssignmentService {
     NameItem OPTION_ASSIGN_FINISH = NameItem.valueOf("选项：任务完成", 7);
     NameItems CONDITIONS = NameItems.valueOf(OPTION_ASSIGN_FINISH,OPTION_PERSON_CHARGE,OPTION_PERSON_FOLLOW,OPTION_PERSON_HANDLE);
 
-    /**
-     * 创建任务
-     * @return
-     */
-    Assignment createAssignment(String title, String content,/*String creator, */Set<String> handlers,
-                                String charger, String lableId, Date startTime,
-                                Date endTime,int level);
+//    /**
+//     * 创建任务
+//     * @return
+//     */
+//    Assignment createAssignment(String title, String content,/*String creator, */Set<String> handlers,
+//                                String charger, String lableId, Date startTime,
+//                                Date endTime,int level);
     /**
      * 创建子任务
      * @return

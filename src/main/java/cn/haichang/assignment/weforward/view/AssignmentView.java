@@ -6,6 +6,7 @@ import cn.weforward.common.NameItem;
 import cn.weforward.protocol.doc.annotation.DocAttribute;
 import cn.weforward.protocol.doc.annotation.DocObject;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -104,5 +105,71 @@ public class AssignmentView {
     @DocAttribute(description = "缺陷简况")
     public String getBugProfile(){
         return m_Assignment.getBugsFinishCount()+" / "+m_Assignment.getBugsCount();
+    }
+
+    @DocAttribute(description = "可扭转的状态")
+    public List<String > getAllowTurnState(){
+        ArrayList<String> states = new ArrayList<>();
+        if (Assignment.STATE_ESTIMATE.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_ESTIMATE.name);
+            states.add(Assignment.STATE_PLAN.name);
+            states.add(Assignment.STATE_REJECT.name);
+            return states;
+        }
+        if (Assignment.STATE_PLAN.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_PLAN.name);
+            states.add(Assignment.STATE_WAIT_DEVELOP.name);
+            states.add(Assignment.STATE_REJECT.name);
+            states.add(Assignment.STATE_PENDING.name);
+            return states;
+        }
+        if (Assignment.STATE_WAIT_DEVELOP.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_WAIT_DEVELOP.name);
+            states.add(Assignment.STATE_DEVELOP.name);
+            states.add(Assignment.STATE_REJECT.name);
+            states.add(Assignment.STATE_PENDING.name);
+            return states;
+        }
+        if (Assignment.STATE_DEVELOP.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_DEVELOP.name);
+            states.add(Assignment.STATE_WAIT_TEST.name);
+            states.add(Assignment.STATE_REJECT.name);
+            states.add(Assignment.STATE_PENDING.name);
+            return states;
+        }
+        if (Assignment.STATE_WAIT_TEST.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_WAIT_TEST.name);
+            states.add(Assignment.STATE_DEVELOP.name);
+            states.add(Assignment.STATE_TEST.name);
+            states.add(Assignment.STATE_REJECT.name);
+            states.add(Assignment.STATE_PENDING.name);
+            return states;
+        }
+        if (Assignment.STATE_TEST.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_TEST.name);
+            states.add(Assignment.STATE_DEVELOP.name);
+            states.add(Assignment.STATE_PASS_TEST.name);
+            states.add(Assignment.STATE_REJECT.name);
+            states.add(Assignment.STATE_PENDING.name);
+            return states;
+        }
+        if (Assignment.STATE_PASS_TEST.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_PASS_TEST.name);
+            states.add(Assignment.STATE_DEVELOP.name);
+            states.add(Assignment.STATE_ONLINE.name);
+            states.add(Assignment.STATE_REJECT.name);
+            states.add(Assignment.STATE_PENDING.name);
+            return states;
+        }
+        if (Assignment.STATE_PENDING.id == m_Assignment.getState().id){
+            states.add("保持为"+Assignment.STATE_PENDING.name);
+            states.add(Assignment.STATE_ESTIMATE.name);
+            states.add(Assignment.STATE_WAIT_DEVELOP.name);
+            states.add(Assignment.STATE_WAIT_TEST.name);
+            states.add(Assignment.STATE_PASS_TEST.name);
+            states.add(Assignment.STATE_REJECT.name);
+            return states;
+        }
+        return states;
     }
 }

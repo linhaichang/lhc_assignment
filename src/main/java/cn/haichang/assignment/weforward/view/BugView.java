@@ -1,10 +1,13 @@
 package cn.haichang.assignment.weforward.view;
 
+import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.Bug;
 import cn.weforward.protocol.doc.annotation.DocAttribute;
 import cn.weforward.protocol.doc.annotation.DocObject;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -54,5 +57,56 @@ public class BugView {
     @DocAttribute(description = "最后处理时间")
     public Date getLastTime(){
         return m_Bug.getLastTime();
+    }
+
+    @DocAttribute(description = "可扭转的状态")
+    public List<String > getAllowTurnState(){
+        ArrayList<String > states = new ArrayList<>();
+        if (Bug.STATE_WAIT_CORRECT.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_WAIT_CORRECT.name);
+            states.add(Bug.STATE_WAIT_RETEST.name);
+            states.add(Bug.STATE_ADVISE_DONT_EDIT.name);
+            states.add(Bug.STATE_ASK_CANT_EDIT.name);
+            return states;
+        }
+        if (Bug.STATE_WAIT_RETEST.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_WAIT_RETEST.name);
+            states.add(Bug.STATE_WAIT_CORRECT.name);
+            states.add(Bug.STATE_SOLVED.name);
+            return states;
+        }
+        if (Bug.STATE_ADVISE_DONT_EDIT.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_ADVISE_DONT_EDIT.name);
+            states.add(Bug.STATE_WAIT_CORRECT.name);
+            states.add(Bug.STATE_NO_EDIT.name);
+            return states;
+        }
+        if (Bug.STATE_ASK_CANT_EDIT.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_ASK_CANT_EDIT.name);
+            states.add(Bug.STATE_WAIT_CORRECT.name);
+            states.add(Bug.STATE_CANT_SOLVE.name);
+            return states;
+        }
+        if (Bug.STATE_SOLVED.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_SOLVED.name);
+            states.add(Bug.STATE_REOPEN.name);
+            return states;
+        }
+        if (Bug.STATE_NO_EDIT.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_NO_EDIT.name);
+            states.add(Bug.STATE_REOPEN.name);
+            return states;
+        }
+        if (Bug.STATE_CANT_SOLVE.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_CANT_SOLVE.name);
+            states.add(Bug.STATE_REOPEN.name);
+            return states;
+        }
+        if (Bug.STATE_REOPEN.id == m_Bug.getState().id){
+            states.add("保持为"+Bug.STATE_REOPEN.name);
+            states.add(Bug.STATE_WAIT_RETEST.name);
+            return states;
+        }
+        return states;
     }
 }

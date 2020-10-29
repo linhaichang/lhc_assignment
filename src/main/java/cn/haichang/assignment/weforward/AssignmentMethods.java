@@ -19,6 +19,7 @@ import cn.weforward.framework.doc.DocMethods;
 import cn.weforward.framework.exception.ForwardException;
 import cn.weforward.framework.support.Global;
 import cn.weforward.framework.util.ValidateUtil;
+import cn.weforward.protocol.datatype.DtList;
 import cn.weforward.protocol.doc.annotation.DocAttribute;
 import cn.weforward.protocol.doc.annotation.DocMethod;
 import cn.weforward.protocol.doc.annotation.DocParameter;
@@ -48,30 +49,30 @@ public class AssignmentMethods implements ExceptionHandler {
         return creator;
     }
 
-    @WeforwardMethod
-    @DocMethod(description = "创建任务",index = 0)
-    public AssignmentView create(AssignmentParam params) throws ApiException {
-        String title = params.getTitle();
-        String content = params.getContent();
-        /**list 转 set*/
-        Set<String> handlers = new HashSet<>(params.getHandlers());
-        String charger = params.getCharger();
-        String lableId = params.getLableId();
-        Date startTime = params.getStartTime();
-        Date endTime = params.getEndTime();
-        int level = params.getLevel();
-        ValidateUtil.isEmpty(title, "标题不能为空");
-        ValidateUtil.isEmpty(content, "内容不能为空");
-        ValidateUtil.isEmpty(lableId, "标签不能为空");
-        Assignment assignment = m_AssignmentService.createAssignment(title
-        , content, handlers, charger, lableId, startTime
-        ,endTime,level);
-        return AssignmentView.valueOf(assignment);
-    }
+//    @WeforwardMethod
+//    @DocMethod(description = "创建任务",index = 0)
+//    public AssignmentView create(AssignmentParam params) throws ApiException {
+//        String title = params.getTitle();
+//        String content = params.getContent();
+//        /**list 转 set*/
+//        Set<String> handlers = new HashSet<>(params.getHandlers());
+//        String charger = params.getCharger();
+//        String lableId = params.getLableId();
+//        Date startTime = params.getStartTime();
+//        Date endTime = params.getEndTime();
+//        int level = params.getLevel();
+//        ValidateUtil.isEmpty(title, "标题不能为空");
+//        ValidateUtil.isEmpty(content, "内容不能为空");
+//        ValidateUtil.isEmpty(lableId, "标签不能为空");
+//        Assignment assignment = m_AssignmentService.createAssignment(title
+//        , content, handlers, charger, lableId, startTime
+//        ,endTime,level);
+//        return AssignmentView.valueOf(assignment);
+//    }
 
     @WeforwardMethod
-    @DocMethod(description = "创建子任务",index = 1)
-    public AssignmentView createSon(SonAssignmentParam params) throws ApiException, MyException {
+    @DocMethod(description = "创建任务或子任务",index = 1)
+    public AssignmentView create(SonAssignmentParam params) throws ApiException, MyException {
         String title = params.getTitle();
         String content = params.getContent();
         /**list 转 set*/
@@ -85,8 +86,6 @@ public class AssignmentMethods implements ExceptionHandler {
         ValidateUtil.isEmpty(title, "标题不能为空");
         ValidateUtil.isEmpty(content, "内容不能为空");
         ValidateUtil.isEmpty(lableId, "标签不能为空");
-        ValidateUtil.isEmpty(fatherId, "父Id不能为空");
-        m_AssignmentService.getAssignment(fatherId);
         Assignment assignment = m_AssignmentService.createAssignmentSon(title
                 , content, handlers, charger, lableId, startTime
                 ,endTime,level,fatherId);
@@ -216,8 +215,6 @@ public class AssignmentMethods implements ExceptionHandler {
         if (!StringUtil.isEmpty(content)){
             assignment.setContent(content);
         }
-        /*增加处理人*/
-        assignment.addHandler(new HashSet<>(params.getHandlers()));
         /*修改负责人*/
         String charger = params.getCharger();
         if (!StringUtil.isEmpty(charger)){
@@ -250,6 +247,7 @@ public class AssignmentMethods implements ExceptionHandler {
         }
         return AssignmentView.valueOf(assignment);
     }
+
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter({
@@ -257,13 +255,38 @@ public class AssignmentMethods implements ExceptionHandler {
             @DocAttribute(name = "follower",necessary = true,description = "跟进人"),
     })
     @DocMethod(description = "增加跟进人" , index = 9)
-    public String addFollower(FriendlyObject params) throws MyException, ApiException {
+    public void addFollower(FriendlyObject params) throws MyException, ApiException {
         String assignmentId = params.getString("assignmentId");
         String follower = params.getString("follower");
         ValidateUtil.isEmpty(assignmentId, "任务id不能为空");
         Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
         assignment.addFollower(follower);
-        return "跟进成功";
+    }
+
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocParameter({
+            @DocAttribute(name = "assignmentId", necessary = true, description = "待操作的任务Id"),
+            @DocAttribute(name = "follower",necessary = true,description = "跟进人")
+    })
+    @DocMethod(description = "移除跟进人" , index = 9)
+    public void removeFollower(FriendlyObject params) throws MyException, ApiException {
+        String assignmentId = params.getString("assignmentId");
+        String follower = params.getString("follower");
+        ValidateUtil.isEmpty(assignmentId, "任务id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
+        assignment.removeFollower(follower);
+    }
+
+    @KeepServiceOrigin
+    @WeforwardMethod
+    @DocMethod(description = "增加处理人" , index = 9)
+    public void addHandlers(AddHandlersParam params) throws MyException, ApiException {
+        String assignmentId = params.getAssignmentId();
+        List<String> handlers = params.getHandlers();
+        ValidateUtil.isEmpty(assignmentId, "任务id不能为空");
+        Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
+        assignment.addHandler(new HashSet<>(handlers));
     }
 
     @KeepServiceOrigin
@@ -273,22 +296,20 @@ public class AssignmentMethods implements ExceptionHandler {
             @DocAttribute(name = "handlerName", necessary = true, description = "待移除的处理人姓名")
     })
     @DocMethod(description = "移除处理人", index = 10)
-    public String removeHandler(FriendlyObject params) throws MyException, ApiException {
+    public void removeHandler(FriendlyObject params) throws MyException, ApiException {
         String assignmentId = params.getString("assignmentId");
         ValidateUtil.isEmpty(assignmentId, "任务id不能为空");
         Assignment assignment = m_AssignmentService.getAssignment(assignmentId);
         String handlerName = params.getString("handlerName");
         assignment.removeHandler(handlerName);
-        return "移除成功";
     }
 
     @KeepServiceOrigin
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "assignmentId", type = String.class,necessary = true, description = "待删除的任务Id"))
     @DocMethod(description = "删除任务", index = 11)
-    public String delete(FriendlyObject params) throws MyException {
+    public void delete(FriendlyObject params) throws MyException {
         m_AssignmentService.deleteAssignment(params.getString("assignmentId"));
-        return "删除成功";
     }
 
     @KeepServiceOrigin

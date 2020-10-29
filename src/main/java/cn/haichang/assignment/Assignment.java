@@ -91,6 +91,8 @@ public interface Assignment {
      */
     void addFollower(String follower);
 
+    void removeFollower(String follower) throws MyException;
+
     /**
      * 负责人
      * @param charger

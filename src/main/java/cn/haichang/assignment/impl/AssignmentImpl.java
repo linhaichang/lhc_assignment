@@ -61,33 +61,9 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         super(di);
     }
 
-    public AssignmentImpl(AssignmentDi di,String title,String content,
-                          Set<String> handlers,
-                          String charger,String lableId,Date startTime,
-                          Date endTime,int level){
-        super(di);
-        genPersistenceId();
-        m_Title=title;
-        m_Content=content;
-        m_Creator= getUser();
-        m_Handlers=handlers;
-        m_Charger=charger;
-        m_Followers=new HashSet<>();
-        m_LableId=lableId;
-        m_StartTime=startTime;
-        m_EndTime=endTime;
-        m_State=STATE_ESTIMATE.id;
-        m_Level=level;
-        m_CreateTime=new Date();
-        m_FatherID=null;
-        m_IsDelete = 0;
-        m_FinishTime = null;
-        getBusinessDi().writeLog(getId(), m_Creator,"创建", "新任务", "");
-        markPersistenceUpdate();
-    }
 
     /**
-     * 子需求构造器，加上fatherID
+     * 构造器
      * @param di 业务依赖接口
      */
     public AssignmentImpl(AssignmentDi di, String title, String content,
@@ -95,7 +71,11 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
                           String lableId, Date startTime, Date endTime,
                           int level, String fatherId) {
         super(di);
-        genPersistenceId(fatherId);
+        if (null == fatherId){
+            genPersistenceId();
+        }else {
+            genPersistenceId(fatherId);
+        }
         m_Title = title;
         m_Content = content;
         m_Creator= getUser();
@@ -173,6 +153,15 @@ public class AssignmentImpl extends AbstractPersistent<AssignmentDi> implements 
         m_Followers.add(follower);
         getBusinessDi().writeLog(getId(), m_Creator,"跟进任务", follower, "");
         markPersistenceUpdate();
+    }
+
+    @Override
+    public void removeFollower(String follower) throws MyException {
+        if (!m_Followers.contains(follower)){
+            throw new MyException("没有此人");
+        }
+        m_Followers.remove(follower);
+        getBusinessDi().writeLog(getId(), m_Creator,"移除跟进人", follower, "");
     }
 
 

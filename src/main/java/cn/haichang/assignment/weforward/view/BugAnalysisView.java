@@ -3,8 +3,7 @@ package cn.haichang.assignment.weforward.view;
 import cn.weforward.protocol.doc.annotation.DocAttribute;
 import cn.weforward.protocol.doc.annotation.DocObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author HaiChang
@@ -15,10 +14,17 @@ public class BugAnalysisView {
     protected int m_BugsCount;
     protected int m_FinishCount;
 
-    protected Map<String ,Integer> m_StateAnalysis;
+//    protected Map<String ,Integer> m_StateAnalysis;
+//    protected Map<String ,Integer> m_TesterAndCount;
+//    protected Map<String ,Integer> m_HandlerAndCount;
+    protected List<String > stateName;
+    protected List<Integer> stateNum;
 
-    protected Map<String ,Integer> m_TesterAndCount;
-    protected Map<String ,Integer> m_HandlerAndCount;
+    protected List<String > testerList;
+    protected List<Integer > testerNum;
+
+    protected List<String > handlerList;
+    protected List<Integer > handlerNum;
 
     public BugAnalysisView(int m_BugsCount, int m_FinishCount,
                            Map<String, Integer> m_StateAnalysis,
@@ -26,9 +32,24 @@ public class BugAnalysisView {
                            Map<String, Integer> m_HandlerAndCount) {
         this.m_BugsCount = m_BugsCount;
         this.m_FinishCount = m_FinishCount;
-        this.m_StateAnalysis = m_StateAnalysis;
-        this.m_TesterAndCount = m_TesterAndCount;
-        this.m_HandlerAndCount = m_HandlerAndCount;
+        stateName = new ArrayList<>();
+        stateNum = new ArrayList<>();
+        testerList = new ArrayList<>();
+        testerNum = new ArrayList<>();
+        handlerList = new ArrayList<>();
+        handlerNum = new ArrayList<>();
+        for (String s : m_StateAnalysis.keySet()) {
+            stateName.add(s);
+            stateNum.add(m_StateAnalysis.get(s));
+        }
+        for (String s : m_TesterAndCount.keySet()) {
+            testerList.add(s);
+            testerNum.add(m_TesterAndCount.get(s));
+        }
+        for (String s : m_HandlerAndCount.keySet()) {
+            handlerList.add(s);
+            handlerNum.add(m_HandlerAndCount.get(s));
+        }
     }
 
     @DocAttribute(description = "总缺陷数")
@@ -40,16 +61,29 @@ public class BugAnalysisView {
         return m_FinishCount;
     }
 
-    @DocAttribute(description = "缺陷分析")
-    public Map<String, Integer> getStateAnalysis() {
-        return m_StateAnalysis;
+    @DocAttribute(description = "缺陷分析状态名")
+    public List<String> getStateName() {
+        return stateName;
     }
-    @DocAttribute(description = "测试人员处理数")
-    public Map<String, Integer> getTesterAndCount() {
-        return m_TesterAndCount;
+    @DocAttribute(description = "缺陷分析状态数量")
+    public List<Integer> getStateNum() {
+        return stateNum;
     }
-    @DocAttribute(description = "处理人员处理数")
-    public Map<String, Integer> getHandlerAndCount() {
-        return m_HandlerAndCount;
+    @DocAttribute(description = "测试人员")
+    public List<String> getTesterList() {
+        return testerList;
+    }
+    @DocAttribute(description = "测试人员测试数量")
+    public List<Integer> getTesterNum() {
+        return testerNum;
+    }
+
+    @DocAttribute(description = "处理人员")
+    public List<String> getHandlerList() {
+        return handlerList;
+    }
+    @DocAttribute(description = "处理人员处理数量")
+    public List<Integer> getHandlerNum() {
+        return handlerNum;
     }
 }

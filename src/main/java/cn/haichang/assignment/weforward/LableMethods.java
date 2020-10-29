@@ -60,7 +60,7 @@ public class LableMethods implements ExceptionHandler {
     @WeforwardMethod
     @DocParameter(@DocAttribute(name = "LableId", type = String.class,necessary = true, description = "标签Id"))
     @DocMethod(description = "删除标签", index = 4)
-    public String delete(FriendlyObject params) throws ApiException, MyException {
+    public void delete(FriendlyObject params) throws ApiException, MyException {
         String lableId = params.getString("LableId");
         ValidateUtil.isEmpty(lableId,"标签Id不能为空");
         Lable lable = m_AssignmentService.getLable(params.getString("LableId"));
@@ -73,7 +73,6 @@ public class LableMethods implements ExceptionHandler {
         }else {
             throw new MyException( "此标签下还有"+i+"条任务，不能删除");
         }
-        return "成功删除标签";
     }
 
     @KeepServiceOrigin

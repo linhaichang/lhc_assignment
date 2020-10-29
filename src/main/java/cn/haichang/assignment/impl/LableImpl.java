@@ -1,6 +1,5 @@
 package cn.haichang.assignment.impl;
 
-import cn.haichang.assignment.Assignment;
 import cn.haichang.assignment.Lable;
 import cn.haichang.assignment.MyException;
 import cn.haichang.assignment.di.AssignmentDi;
@@ -25,7 +24,7 @@ public class LableImpl extends AbstractPersistent<AssignmentDi> implements Lable
 
     public LableImpl(AssignmentDi di, String lableName) {
         super(di);
-        genPersistenceId(lableName);
+        genPersistenceId();
         m_LableName = lableName;
         markPersistenceUpdate();
     }

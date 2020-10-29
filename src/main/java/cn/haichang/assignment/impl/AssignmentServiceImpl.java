@@ -5,6 +5,7 @@ import cn.haichang.assignment.*;
 import cn.weforward.common.NameItem;
 import cn.weforward.common.ResultPage;
 import cn.weforward.common.util.ResultPageHelper;
+import cn.weforward.common.util.StringUtil;
 import cn.weforward.data.log.BusinessLoggerFactory;
 import cn.weforward.data.persister.PersisterFactory;
 import cn.weforward.data.search.Searcher;
@@ -24,16 +25,16 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         super(factory, loggerFactory);
     }
 
-    /**
-     * 创建任务
-     * @return
-     */
-    @Override
-    public Assignment createAssignment(String title, String content, Set<String> handlers,
-                                       String charger, String lableId, Date startTime,
-                                       Date endTime, int level) {
-        return new AssignmentImpl(this, title, content, handlers, charger, lableId, startTime, endTime, level);
-    }
+//    /**
+//     * 创建任务
+//     * @return
+//     */
+//    @Override
+//    public Assignment createAssignment(String title, String content, Set<String> handlers,
+//                                       String charger, String lableId, Date startTime,
+//                                       Date endTime, int level) {
+//        return new AssignmentImpl(this, title, content, handlers, charger, lableId, startTime, endTime, level);
+//    }
 
     /**
      * 创建子任务
@@ -45,9 +46,9 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
                                           String lableId, Date startTime,
                                           Date endTime, int level, String fatherId) throws MyException {
         //校验父任务是否存在
-        String realId = getAssignment(fatherId).getId().getOrdinal();
+//        String realId = getAssignment(fatherId).getId().getOrdinal();
         return new AssignmentImpl(this, title, content, handlers, charger
-        , lableId, startTime, endTime, level,realId);
+        , lableId, startTime, endTime, level,fatherId);
     }
 
     /**
@@ -169,7 +170,6 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         ResultPage<Assignment> rp = getAllAssignments();
         List<Assignment> list = new ArrayList<>();
         for (Assignment assignment : ResultPageHelper.toForeach(rp)) {
-
             if (assignment.getTitle().contains(keyword) && !assignment.isDelete())
             list.add(assignment);
         }
@@ -200,7 +200,7 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
                 continue;
             }
             //排除子任务
-            if (null != assignment.getFatherId()){
+            if (null != assignment.getFatherId() && 0 < assignment.getFatherId().length()){
                 continue;
             }
             list.add(assignment);
@@ -324,35 +324,18 @@ public class AssignmentServiceImpl extends AssignmentDiImpl implements Assignmen
         ResultPage<Bug> rp = getBugByAssignmentId(assignmentId);
         List<Bug> list = new CopyOnWriteArrayList<>();
             for (Bug bug : ResultPageHelper.toForeach(rp)){
-                    list.add(bug);
-            }
-            //如果输入的参数测试人不为空
-            if (null != tester && !"".equals(tester)){
-                for (Bug bug : list) {
-                    //则移除所有不含 “参数测试人” 的缺陷
-                    if (!bug.getTesters().contains(tester)){
-                        list.remove(bug);
-                    }
+                if (!StringUtil.isEmpty(tester) && !bug.getTesters().contains(tester)){
+                    continue;
                 }
-            }
-            //如果输入的参数处理人不为空
-            if (null != handler && !"".equals(handler)){
-                for (Bug bug : list) {
-                    //则移除所有不含 “参数处理人” 的缺陷
-                    if (!bug.getTestHandlers().contains(handler)){
-                        list.remove(bug);
-                    }
+                if (!StringUtil.isEmpty(handler) && !bug.getTestHandlers().contains(handler)){
+                    continue;
                 }
-            }
-            //如果输入的 状态参数 不为空
-            if (0 != state){
-                for (Bug bug : list){
-                    //则移除所有不等于 “状态参数” 的缺陷
-                    if (bug.getState().id != state){
-                        list.remove(bug);
-                    }
+                if (0 != state && state != bug.getState().id ){
+                    continue;
                 }
+                list.add(bug);
             }
+
         return ResultPageHelper.toResultPage(list);
     }
 }
